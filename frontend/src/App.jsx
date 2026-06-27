@@ -1,32 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
   const [hotels, setHotels] = useState([]);
 
-  // Backend eken data ganna function eka
+  // Backend eken data genna ganna hook eka
   useEffect(() => {
-    axios.get('http://localhost:5000/api/hotels')
-      .then((response) => {
-        setHotels(response.data);
-      })
-      .catch((error) => {
-        console.error("Data ganna bari wuna!", error);
-      });
+    fetch('http://localhost:5001/api/hotels')
+      .then((response) => response.json())
+      .then((data) => setHotels(data))
+      .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-      <h1>Sri Lanka Travel Hub 🌴</h1>
-      <h2>Available Hotels</h2>
-      <ul>
+    <div className="app-container">
+      <h1>WanderLanka Hotels</h1>
+      <p>Ape database eken gaththa hotels list eka pahala thiyenawa:</p>
+      
+      <div className="hotel-list">
         {hotels.map((hotel) => (
-          <li key={hotel.id} style={{ marginBottom: '10px' }}>
-            <strong>{hotel.name}</strong> - {hotel.location} <br />
-            Price: {hotel.price} per night
-          </li>
+          <div key={hotel._id} className="hotel-card">
+            <h2>{hotel.name}</h2>
+            <p><strong>Location:</strong> {hotel.location}</p>
+            <p><strong>Price:</strong> {hotel.price}</p>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
