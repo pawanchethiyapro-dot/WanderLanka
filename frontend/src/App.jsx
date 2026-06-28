@@ -1,32 +1,29 @@
-import { useState, useEffect } from 'react';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Home from './Home';
+import HotelList from './HotelList';
+import AddHotel from './AddHotel';
+import RiderList from './RiderList';
+import AddVehicle from './AddVehicle';
 
 function App() {
-  const [hotels, setHotels] = useState([]);
-
-  // Backend eken data genna ganna hook eka
-  useEffect(() => {
-    fetch('http://localhost:5001/api/hotels')
-      .then((response) => response.json())
-      .then((data) => setHotels(data))
-      .catch((error) => console.error('Error fetching data:', error));
-  }, []);
-
   return (
-    <div className="app-container">
-      <h1>WanderLanka Hotels</h1>
-      <p>Ape database eken gaththa hotels list eka pahala thiyenawa:</p>
-      
-      <div className="hotel-list">
-        {hotels.map((hotel) => (
-          <div key={hotel._id} className="hotel-card">
-            <h2>{hotel.name}</h2>
-            <p><strong>Location:</strong> {hotel.location}</p>
-            <p><strong>Price:</strong> {hotel.price}</p>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Router>
+      <nav style={{ padding: '20px', background: '#222', display: 'flex', gap: '15px' }}>
+        <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Home</Link>
+        <Link to="/hotels" style={{ color: 'white', textDecoration: 'none' }}>View Hotels</Link>
+        <Link to="/register-hotel" style={{ color: 'white', textDecoration: 'none' }}>Register Hotel</Link>
+        <Link to="/riders" style={{ color: 'white', textDecoration: 'none' }}>View Riders</Link>
+        <Link to="/register-rider" style={{ color: 'white', textDecoration: 'none' }}>Register Rider</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/hotels" element={<HotelList />} />
+        <Route path="/register-hotel" element={<AddHotel />} />
+        <Route path="/riders" element={<RiderList />} />
+        <Route path="/register-rider" element={<AddVehicle />} />
+      </Routes>
+    </Router>
   );
 }
 
