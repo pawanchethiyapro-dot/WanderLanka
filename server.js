@@ -115,3 +115,17 @@ app.get('/api/hotels', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+const Booking = require('./models/Booking');
+
+// Booking submit karana route eka
+app.post('/api/Bookings', async (req, res) => {
+    try {
+        const newBooking = new Booking(req.body);
+        await newBooking.save();
+        res.status(201).json({ message: "Booking successful!", booking: newBooking });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+

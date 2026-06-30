@@ -20,15 +20,17 @@ function RiderList() {
         fetchRiders(); // Page eka load weddi run wenawa
     }, []); // Me empty array eka thibboth page eka reload wenna ona
 
-    return (
-        <div>
-    <h1>All Riders</h1>
-    {riders.length > 0 ? (
-        riders.map(r => <div key={r._id}>{r.driverName || "No Name"}</div>)
-    ) : (
-        <p>No riders found in database.</p>
-    )}
-</div>
-    );
+   return (
+    <div className="card-container"> 
+        {riders.map((r) => (
+            <div key={r._id} className="card"> 
+                {/* Rider ge details */}
+                <h3>{r.driverName}</h3>
+                <p>Vehicle: {r.vehicleType}</p>
+                <p>Contact: {r.contactNumber}</p>
+            </div>
+        ))}
+    </div>
+);
 }
 export default RiderList;

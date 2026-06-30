@@ -4,8 +4,21 @@ import HotelList from './HotelList';
 import AddHotel from './AddHotel';
 import RiderList from './RiderList';
 import AddVehicle from './AddVehicle';
+import BookingPage from './BookingPage';
+import { useState, useEffect } from 'react';
+import MyBookings from './MyBookings';
 
 function App() {
+  const [hotels, setHotels] = useState([]);
+
+  // Backend eken data genna ganna hook eka
+  useEffect(() => {
+    fetch('http://localhost:5001/api/hotels')
+      .then((response) => response.json())
+      .then((data) => setHotels(data))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
   return (
     <Router>
       <nav style={{ padding: '20px', background: '#222', display: 'flex', gap: '15px' }}>
@@ -22,6 +35,8 @@ function App() {
         <Route path="/register-hotel" element={<AddHotel />} />
         <Route path="/riders" element={<RiderList />} />
         <Route path="/register-rider" element={<AddVehicle />} />
+        <Route path="/book/:id" element={<BookingPage />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
       </Routes>
     </Router>
   );
