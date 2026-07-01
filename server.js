@@ -119,11 +119,44 @@ app.get('/api/hotels', async (req, res) => {
 const Booking = require('./models/Booking');
 
 // Booking submit karana route eka
-app.post('/api/Bookings', async (req, res) => {
+app.post('/api/bookings', async (req, res) => {
     try {
         const newBooking = new Booking(req.body);
         await newBooking.save();
         res.status(201).json({ message: "Booking successful!", booking: newBooking });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+const RiderBooking = require('./models/RiderBooking');
+
+app.post('/api/rider-bookings', async (req, res) => {
+    try {
+        const newRiderBooking = new RiderBooking(req.body);
+        await newRiderBooking.save();
+        res.status(201).json({ message: 'Rider booking successful!' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// GET route to retrieve hotel bookings
+app.get('/api/bookings', async (req, res) => {
+    try {
+        const bookings = await Booking.find().populate('hotelId');
+        res.status(200).json(bookings);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// GET route to retrieve rider bookings
+app.get('/api/rider-bookings', async (req, res) => {
+    try {
+        const riderBookings = await RiderBooking.find().populate('riderId');
+        res.status(200).json(riderBookings);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

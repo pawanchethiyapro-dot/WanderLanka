@@ -7,6 +7,7 @@ import AddVehicle from './AddVehicle';
 import BookingPage from './BookingPage';
 import { useState, useEffect } from 'react';
 import MyBookings from './MyBookings';
+import RiderBookingPage from './RiderBookingPage';
 
 function App() {
   const [hotels, setHotels] = useState([]);
@@ -27,6 +28,7 @@ function App() {
         <Link to="/register-hotel" style={{ color: 'white', textDecoration: 'none' }}>Register Hotel</Link>
         <Link to="/riders" style={{ color: 'white', textDecoration: 'none' }}>View Riders</Link>
         <Link to="/register-rider" style={{ color: 'white', textDecoration: 'none' }}>Register Rider</Link>
+        <Link to="/my-bookings" style={{ color: 'white', textDecoration: 'none' }}>My Bookings</Link>
       </nav>
 
       <Routes>
@@ -37,6 +39,7 @@ function App() {
         <Route path="/register-rider" element={<AddVehicle />} />
         <Route path="/book/:id" element={<BookingPage />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/book-rider/:id" element={<RiderBookingPage />} />
       </Routes>
     </Router>
   );
