@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path');
 require('dotenv').config();
 const Hotel = require('./models/Hotel'); // Aluth model eka api server ekata gannawa
 const Vehicle = require('./models/Vehicle');
@@ -12,6 +13,7 @@ const PORT = 5001;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
@@ -71,7 +73,6 @@ app.listen(PORT, () => {
 });
 
 const multer = require('multer');
-const path = require('path');
 
 // Image save karana folder eka hadamu
 const storage = multer.diskStorage({
@@ -82,15 +83,16 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Vehicle register karana route eka (photo ekath ekka)
-app.post('/api/vehicles', upload.single('license'), async (req, res) => {
+// Vehicle register karana route eka (photos dekath ekka)
+app.post('/api/vehicles', upload.fields([{ name: 'riderPhoto', maxCount: 1 }, { name: 'licensePhoto', maxCount: 1 }]), async (req, res) => {
     try {
         const newVehicle = new Vehicle({
             ...req.body,
-            licensePhoto: req.file ? req.file.path : null
+            riderPhoto: req.files && req.files['riderPhoto'] ? req.files['riderPhoto'][0].path : null,
+            licensePhoto: req.files && req.files['licensePhoto'] ? req.files['licensePhoto'][0].path : null
         });
         await newVehicle.save();
-        res.json({ message: "Vehicle and License registered! 🎉" });
+        res.json({ message: "Vehicle, Rider Photo, and License registered! 🎉" });
     } catch (err) {
         console.error("Backend Error:", err); // Meka damma gaman terminal eke error eka penawa
         res.status(500).json({ error: err.message || "Something went wrong!" });

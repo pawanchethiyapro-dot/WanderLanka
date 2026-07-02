@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Car, User, CreditCard, Phone, Tag, DollarSign, Bike } from 'lucide-react';
+import { Car, User, CreditCard, Phone, Tag, DollarSign, Bike, Camera, FileBadge } from 'lucide-react';
 
 function AddVehicle() {
     const [vehicle, setVehicle] = useState({ driverName: '', nic: '', phone: '', vehicleType: '', plateNumber: '', pricePerDay: '' });
+    const [riderPhoto, setRiderPhoto] = useState(null);
+    const [licensePhoto, setLicensePhoto] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
@@ -14,9 +16,20 @@ function AddVehicle() {
 
         setIsSubmitting(true);
         try {
-            await axios.post('http://localhost:5001/api/vehicles', vehicle);
+            const formData = new FormData();
+            Object.keys(vehicle).forEach(key => formData.append(key, vehicle[key]));
+            if (riderPhoto) {
+                formData.append('riderPhoto', riderPhoto);
+            }
+            if (licensePhoto) {
+                formData.append('licensePhoto', licensePhoto);
+            }
+
+            await axios.post('http://localhost:5001/api/vehicles', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             alert('Vehicle registered successfully!');
-            navigate('/riders'); // Register una gaman list ekata yanawa
+            navigate('/riders'); 
         } catch (err) {
             alert('Error registering vehicle');
             console.error(err);
@@ -124,6 +137,34 @@ function AddVehicle() {
                                 value={vehicle.pricePerDay}
                                 onChange={(e) => setVehicle({...vehicle, pricePerDay: e.target.value})}
                                 required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="input-label">Rider Photo</label>
+                        <div className="input-wrapper">
+                            <Camera className="input-icon" size={20} />
+                            <input 
+                                type="file"
+                                accept="image/*"
+                                className="form-input" 
+                                onChange={(e) => setRiderPhoto(e.target.files[0])}
+                                style={{ padding: '0.6rem 0.5rem 0.5rem 2.8rem' }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="input-label">Driving License Photo</label>
+                        <div className="input-wrapper">
+                            <FileBadge className="input-icon" size={20} />
+                            <input 
+                                type="file"
+                                accept="image/*"
+                                className="form-input" 
+                                onChange={(e) => setLicensePhoto(e.target.files[0])}
+                                style={{ padding: '0.6rem 0.5rem 0.5rem 2.8rem' }}
                             />
                         </div>
                     </div>

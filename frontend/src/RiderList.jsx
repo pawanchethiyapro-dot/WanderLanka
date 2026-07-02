@@ -21,8 +21,8 @@ function RiderList() {
 
     // Returns a nice placeholder based on vehicle type (default to TukTuk or car)
     const getVehicleImage = (vehicle) => {
-        if (vehicle.licensePhoto) {
-            return `http://localhost:5001/${vehicle.licensePhoto}`;
+        if (vehicle.riderPhoto) {
+            return `http://localhost:5001/${vehicle.riderPhoto}`;
         }
         const type = String(vehicle.vehicleType).toLowerCase();
         if (type.includes('tuk') || type.includes('three') || type.includes('auto')) {

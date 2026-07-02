@@ -8,7 +8,8 @@ const vehicleSchema = new mongoose.Schema({
     plateNumber: { type: String, required: true, unique: true },
     pricePerDay: { type: Number, required: true },
     status: { type: String, default: 'available' },
-    licensePhoto: { type: String } // Meka thamai aluthenma damme
+    licensePhoto: { type: String }, // For Driving License
+    riderPhoto: { type: String }    // For Rider Profile Picture
 });
 
 module.exports = mongoose.model('Vehicle', vehicleSchema);
