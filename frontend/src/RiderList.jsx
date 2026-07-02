@@ -1,17 +1,14 @@
-// RiderList.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 
 function RiderList() {
     const [riders, setRiders] = useState([]);
     const navigate = useNavigate();
 
-    // Data fetch karana function eka
     const fetchRiders = async () => {
         try {
-            const res = await axios.get('http://localhost:5001/api/vehicles'); // Oyage endpoint eka hari da balanna
+            const res = await axios.get('http://localhost:5001/api/vehicles');
             setRiders(res.data);
         } catch (err) {
             console.error(err);
@@ -19,36 +16,73 @@ function RiderList() {
     };
 
     useEffect(() => {
-        fetchRiders(); // Page eka load weddi run wenawa
-    }, []); // Me empty array eka thibboth page eka reload wenna ona
+        fetchRiders();
+    }, []);
 
-   return (
-    <div className="card-container"> 
-        {riders.map((r) => (
-            <div key={r._id} className="card"> 
-                {/* Rider ge details */}
-                <h3>{r.driverName}</h3>
-                <p>Vehicle: {r.vehicleType}</p>
-                <p>Contact: {r.phone}</p>
-                <p>Price: Rs. {r.pricePerDay} / Day</p>
-                <button 
-                    onClick={() => navigate(`/book-rider/${r._id}`)}
-                    style={{
-                        marginTop: '10px',
-                        padding: '10px 20px',
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
-                >
-                    Book Rider
-                </button>
+    // Returns a nice placeholder based on vehicle type (default to TukTuk or car)
+    const getVehicleImage = (vehicle) => {
+        if (vehicle.licensePhoto) {
+            return `http://localhost:5001/${vehicle.licensePhoto}`;
+        }
+        const type = String(vehicle.vehicleType).toLowerCase();
+        if (type.includes('tuk') || type.includes('three') || type.includes('auto')) {
+            return "https://images.unsplash.com/photo-1594913785162-e67853f235b5?auto=format&fit=crop&w=600&q=80"; // Sri Lankan TukTuk
+        }
+        return "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=600&q=80"; // Travel car
+    };
+
+    return (
+        <div style={{ padding: '40px 20px' }}>
+            <h1 style={{ textAlign: 'center', marginBottom: '10px', color: 'var(--navy-blue)' }}>🚗 Travel Riders</h1>
+            <p style={{ textAlign: 'center', color: 'var(--text-light)', marginBottom: '40px', fontSize: '16px' }}>
+                Hire local, verified drivers to explore Sri Lanka at your own pace.
+            </p>
+
+            <div className="card-container"> 
+                {riders.map((r) => (
+                    <div key={r._id} className="card"> 
+                        <img 
+                            src={getVehicleImage(r)} 
+                            alt={r.driverName} 
+                            style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                        />
+                        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                            <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', color: 'var(--text-h)' }}>{r.driverName}</h3>
+                            <p style={{ margin: '0 0 6px 0', color: 'var(--text)', fontSize: '14px' }}>
+                                <strong>Vehicle:</strong> {r.vehicleType} ({r.plateNumber})
+                            </p>
+                            <p style={{ margin: '0 0 6px 0', color: 'var(--text-light)', fontSize: '14px' }}>
+                                <strong>📞 Contact:</strong> {r.phone}
+                            </p>
+                            <p style={{ margin: '0 0 20px 0', color: 'var(--primary)', fontWeight: '700', fontSize: '18px' }}>
+                                Rs. {Number(r.pricePerDay).toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ day</span>
+                            </p>
+                            <button 
+                                onClick={() => navigate(`/book-rider/${r._id}`)}
+                                style={{
+                                    marginTop: 'auto',
+                                    padding: '12px 20px',
+                                    backgroundColor: 'var(--primary)',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    fontWeight: '700',
+                                    fontSize: '15px',
+                                    boxShadow: '0 4px 10px rgba(0, 177, 168, 0.2)',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseOver={(e) => { e.target.style.background = 'var(--primary-hover)'; e.target.style.transform = 'translateY(-1px)'; }}
+                                onMouseOut={(e) => { e.target.style.background = 'var(--primary)'; e.target.style.transform = 'none'; }}
+                            >
+                                Book Rider
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
-        ))}
-    </div>
-);
+        </div>
+    );
 }
+
 export default RiderList;
