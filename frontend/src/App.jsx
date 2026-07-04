@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import Home from './Home';
 import HotelList from './HotelList';
 import AddHotel from './AddHotel';
@@ -8,23 +8,29 @@ import BookingPage from './BookingPage';
 import { useState, useEffect } from 'react';
 import MyBookings from './MyBookings';
 import RiderBookingPage from './RiderBookingPage';
+import AdminPanel from './AdminPanel';
+import Partner from './Partner';
+import Login from './Login';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { LogOut } from 'lucide-react';
 
-function App() {
-  const [hotels, setHotels] = useState([]);
+const PrivateRoute = ({ children, role }) => {
+    const { user, loading } = useAuth();
+    if (loading) return <div>Loading...</div>;
+    if (!user) return <Navigate to="/login" />;
+    if (role && user.role !== role) return <Navigate to="/" />;
+    return children;
+};
 
-  // Backend eken data genna ganna hook eka
-  useEffect(() => {
-    fetch('http://localhost:5001/api/hotels')
-      .then((response) => response.json())
-      .then((data) => setHotels(data))
-      .catch((error) => console.error('Error fetching data:', error));
-  }, []);
+const Navigation = () => {
+    const { user, logout } = useAuth();
 
-  return (
-    <Router>
+    return (
       <nav style={{ 
         padding: '16px 28px', 
         background: 'var(--navy-blue)', 
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
         display: 'flex', 
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -50,36 +56,71 @@ function App() {
           </Link>
         </div>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <Link to="/" style={{ color: '#cbd5e1', textDecoration: 'none', fontWeight: '600', fontSize: '15px', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'var(--primary)'} onMouseOut={(e) => e.target.style.color = '#cbd5e1'}>Home</Link>
-          <Link to="/hotels" style={{ color: '#cbd5e1', textDecoration: 'none', fontWeight: '600', fontSize: '15px', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'var(--primary)'} onMouseOut={(e) => e.target.style.color = '#cbd5e1'}>View Hotels</Link>
-          <Link to="/register-hotel" style={{ color: '#cbd5e1', textDecoration: 'none', fontWeight: '600', fontSize: '15px', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'var(--primary)'} onMouseOut={(e) => e.target.style.color = '#cbd5e1'}>Register Hotel</Link>
-          <Link to="/riders" style={{ color: '#cbd5e1', textDecoration: 'none', fontWeight: '600', fontSize: '15px', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'var(--primary)'} onMouseOut={(e) => e.target.style.color = '#cbd5e1'}>View Riders</Link>
-          <Link to="/register-rider" style={{ color: '#cbd5e1', textDecoration: 'none', fontWeight: '600', fontSize: '15px', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'var(--primary)'} onMouseOut={(e) => e.target.style.color = '#cbd5e1'}>Register Rider</Link>
-          <Link to="/my-bookings" style={{ 
-            color: 'white', 
-            textDecoration: 'none', 
-            fontWeight: '700', 
-            fontSize: '15px', 
-            background: 'var(--primary)',
-            padding: '8px 18px',
-            borderRadius: '30px',
-            boxShadow: '0 4px 10px rgba(0, 177, 168, 0.3)',
-            transition: 'all 0.2s' 
-          }} onMouseOver={(e) => { e.target.style.background = 'var(--primary-hover)'; e.target.style.transform = 'translateY(-1px)'; }} onMouseOut={(e) => { e.target.style.background = 'var(--primary)'; e.target.style.transform = 'none'; }}>My Bookings</Link>
+          <Link to="/" className="nav-link" style={navLinkStyle}>Home</Link>
+          <Link to="/hotels" className="nav-link" style={navLinkStyle}>View Hotels</Link>
+          <Link to="/riders" className="nav-link" style={navLinkStyle}>View Riders</Link>
+          {!user && <Link to="/partner" className="nav-link" style={navLinkStyle}>Partner With Us</Link>}
+          
+          {user?.role === 'admin' && (
+              <Link to="/admin" className="nav-link" style={navLinkStyle}>Admin</Link>
+          )}
+
+          {user && (
+            <Link to="/my-bookings" style={{ 
+              color: 'white', 
+              textDecoration: 'none', 
+              fontWeight: '700', 
+              fontSize: '15px', 
+              background: 'var(--primary)',
+              padding: '8px 18px',
+              borderRadius: '30px',
+              boxShadow: '0 4px 10px rgba(0, 177, 168, 0.3)',
+              transition: 'all 0.2s' 
+            }} onMouseOver={(e) => { e.target.style.background = 'var(--primary-hover)'; e.target.style.transform = 'translateY(-1px)'; }} onMouseOut={(e) => { e.target.style.background = 'var(--primary)'; e.target.style.transform = 'none'; }}>My Bookings</Link>
+          )}
+
+          {!user ? (
+            <Link to="/login" style={navLinkStyle}>Login</Link>
+          ) : (
+            <button onClick={logout} style={{ ...navLinkStyle, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444' }}>
+                <LogOut size={16} /> Logout
+            </button>
+          )}
         </div>
       </nav>
+    );
+};
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/hotels" element={<HotelList />} />
-        <Route path="/register-hotel" element={<AddHotel />} />
-        <Route path="/riders" element={<RiderList />} />
-        <Route path="/register-rider" element={<AddVehicle />} />
-        <Route path="/book/:id" element={<BookingPage />} />
-        <Route path="/my-bookings" element={<MyBookings />} />
-        <Route path="/book-rider/:id" element={<RiderBookingPage />} />
-      </Routes>
-    </Router>
+const navLinkStyle = { color: '#cbd5e1', textDecoration: 'none', fontWeight: '600', fontSize: '15px', transition: 'color 0.2s' };
+
+function App() {
+  return (
+    <AuthProvider>
+        <Router>
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/hotels" element={<HotelList />} />
+            <Route path="/partner" element={<Partner />} />
+            <Route path="/register-hotel" element={<AddHotel />} />
+            <Route path="/riders" element={<RiderList />} />
+            <Route path="/register-rider" element={<AddVehicle />} />
+            <Route path="/book/:id" element={<BookingPage />} />
+            <Route path="/my-bookings" element={
+                <PrivateRoute>
+                    <MyBookings />
+                </PrivateRoute>
+            } />
+            <Route path="/book-rider/:id" element={<RiderBookingPage />} />
+            <Route path="/admin" element={
+                <PrivateRoute role="admin">
+                    <AdminPanel />
+                </PrivateRoute>
+            } />
+          </Routes>
+        </Router>
+    </AuthProvider>
   );
 }
 

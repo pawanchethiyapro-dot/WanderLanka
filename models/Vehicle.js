@@ -9,7 +9,8 @@ const vehicleSchema = new mongoose.Schema({
     pricePerDay: { type: Number, required: true },
     status: { type: String, default: 'available' },
     licensePhoto: { type: String }, // For Driving License
-    riderPhoto: { type: String }    // For Rider Profile Picture
+    riderPhoto: { type: String },    // For Rider Profile Picture
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
 module.exports = mongoose.model('Vehicle', vehicleSchema);

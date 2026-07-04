@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Car, User, CreditCard, Phone, Tag, DollarSign, Bike, Camera, FileBadge } from 'lucide-react';
+import { Car, User, CreditCard, Phone, Tag, DollarSign, Bike, Camera, FileBadge, Mail, Lock } from 'lucide-react';
 
 function AddVehicle() {
-    const [vehicle, setVehicle] = useState({ driverName: '', nic: '', phone: '', vehicleType: '', plateNumber: '', pricePerDay: '' });
+    const [vehicle, setVehicle] = useState({ driverName: '', nic: '', phone: '', vehicleType: '', plateNumber: '', pricePerDay: '', email: '', password: '' });
     const [riderPhoto, setRiderPhoto] = useState(null);
     const [licensePhoto, setLicensePhoto] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,8 +16,23 @@ function AddVehicle() {
 
         setIsSubmitting(true);
         try {
+            // 1. Register User Account
+            const userRes = await axios.post('http://localhost:5001/api/auth/register', {
+                email: vehicle.email,
+                password: vehicle.password,
+                role: 'rider'
+            });
+            const userId = userRes.data._id;
+
+            // 2. Register Rider/Vehicle Profile
             const formData = new FormData();
-            Object.keys(vehicle).forEach(key => formData.append(key, vehicle[key]));
+            Object.keys(vehicle).forEach(key => {
+                if (key !== 'email' && key !== 'password') {
+                    formData.append(key, vehicle[key]);
+                }
+            });
+            formData.append('userId', userId);
+            
             if (riderPhoto) {
                 formData.append('riderPhoto', riderPhoto);
             }
@@ -28,8 +43,9 @@ function AddVehicle() {
             await axios.post('http://localhost:5001/api/vehicles', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            alert('Vehicle registered successfully!');
-            navigate('/riders'); 
+            alert('Rider registered successfully! Please login.');
+            navigate('/login'); 
+
         } catch (err) {
             alert('Error registering vehicle');
             console.error(err);
@@ -51,6 +67,37 @@ function AddVehicle() {
 
                 <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                     
+                    <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                        <label className="input-label">Email Address (For Login)</label>
+                        <div className="input-wrapper">
+                            <Mail className="input-icon" size={20} />
+                            <input 
+                                type="email"
+                                className="form-input" 
+                                placeholder="Enter email" 
+                                value={vehicle.email}
+                                onChange={(e) => setVehicle({...vehicle, email: e.target.value})}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                        <label className="input-label">Password</label>
+                        <div className="input-wrapper">
+                            <Lock className="input-icon" size={20} />
+                            <input 
+                                type="password"
+                                className="form-input" 
+                                placeholder="Create password" 
+                                value={vehicle.password}
+                                onChange={(e) => setVehicle({...vehicle, password: e.target.value})}
+                                required
+                                minLength="6"
+                            />
+                        </div>
+                    </div>
+
                     <div className="input-group" style={{ gridColumn: '1 / -1' }}>
                         <label className="input-label">Driver Name</label>
                         <div className="input-wrapper">

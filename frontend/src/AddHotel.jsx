@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Building2, MapPin, DollarSign, Hotel } from 'lucide-react';
+import { Building2, MapPin, DollarSign, Hotel, Mail, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function AddHotel() {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [hotel, setHotel] = useState({ name: '', location: '', price: '' });
+    const [hotel, setHotel] = useState({ name: '', location: '', price: '', email: '', password: '' });
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -14,11 +14,28 @@ function AddHotel() {
 
         setIsSubmitting(true);
         try {
-            await axios.post('http://localhost:5001/api/hotels', hotel);
-            alert('Hotel added successfully!');
-            navigate('/hotels');
+            // 1. Register User Account
+            const userRes = await axios.post('http://localhost:5001/api/auth/register', {
+                email: hotel.email,
+                password: hotel.password,
+                role: 'hotel'
+            });
+            const userId = userRes.data._id;
+
+            // 2. Register Hotel Profile
+            const hotelData = {
+                name: hotel.name,
+                location: hotel.location,
+                price: hotel.price,
+                userId: userId
+            };
+            await axios.post('http://localhost:5001/api/hotels', hotelData);
+            
+            alert('Hotel registered successfully! Please login.');
+            navigate('/login'); // We will create this page next
         } catch (err) {
-            alert('Error adding hotel');
+            alert(err.response?.data?.message || 'Error adding hotel');
+            console.error(err);
         } finally {
             setIsSubmitting(false);
         }
@@ -36,6 +53,37 @@ function AddHotel() {
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <div className="input-group">
+                        <label className="input-label">Email Address (For Login)</label>
+                        <div className="input-wrapper">
+                            <Mail className="input-icon" size={20} />
+                            <input 
+                                type="email"
+                                className="form-input" 
+                                placeholder="Enter email" 
+                                value={hotel.email}
+                                onChange={(e) => setHotel({...hotel, email: e.target.value})}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="input-label">Password</label>
+                        <div className="input-wrapper">
+                            <Lock className="input-icon" size={20} />
+                            <input 
+                                type="password"
+                                className="form-input" 
+                                placeholder="Create password" 
+                                value={hotel.password}
+                                onChange={(e) => setHotel({...hotel, password: e.target.value})}
+                                required
+                                minLength="6"
+                            />
+                        </div>
+                    </div>
+
                     <div className="input-group">
                         <label className="input-label">Hotel Name</label>
                         <div className="input-wrapper">

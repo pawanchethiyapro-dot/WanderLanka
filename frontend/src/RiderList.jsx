@@ -33,7 +33,14 @@ function RiderList() {
 
     return (
         <div style={{ padding: '40px 20px' }}>
-            <h1 style={{ textAlign: 'center', marginBottom: '10px', color: 'var(--navy-blue)' }}>🚗 Travel Riders</h1>
+            <h1 style={{ 
+                textAlign: 'center', 
+                marginBottom: '10px', 
+                background: 'linear-gradient(to right, var(--primary), var(--secondary))',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontFamily: 'var(--heading)'
+            }}>🚗 Travel Riders</h1>
             <p style={{ textAlign: 'center', color: 'var(--text-light)', marginBottom: '40px', fontSize: '16px' }}>
                 Hire local, verified drivers to explore Sri Lanka at your own pace.
             </p>
@@ -55,25 +62,12 @@ function RiderList() {
                                 <strong>📞 Contact:</strong> {r.phone}
                             </p>
                             <p style={{ margin: '0 0 20px 0', color: 'var(--primary)', fontWeight: '700', fontSize: '18px' }}>
-                                Rs. {Number(r.pricePerDay).toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ day</span>
+                                Rs. {r.pricePerDay ? Number(r.pricePerDay).toLocaleString() : 'N/A'} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ day</span>
                             </p>
                             <button 
                                 onClick={() => navigate(`/book-rider/${r._id}`)}
-                                style={{
-                                    marginTop: 'auto',
-                                    padding: '12px 20px',
-                                    backgroundColor: 'var(--primary)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer',
-                                    fontWeight: '700',
-                                    fontSize: '15px',
-                                    boxShadow: '0 4px 10px rgba(0, 177, 168, 0.2)',
-                                    transition: 'all 0.2s'
-                                }}
-                                onMouseOver={(e) => { e.target.style.background = 'var(--primary-hover)'; e.target.style.transform = 'translateY(-1px)'; }}
-                                onMouseOut={(e) => { e.target.style.background = 'var(--primary)'; e.target.style.transform = 'none'; }}
+                                className="btn-primary"
+                                style={{ marginTop: 'auto', width: '100%' }}
                             >
                                 Book Rider
                             </button>

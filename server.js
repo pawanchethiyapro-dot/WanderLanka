@@ -3,9 +3,12 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 require('dotenv').config();
-const Hotel = require('./models/Hotel'); // Aluth model eka api server ekata gannawa
+const Hotel = require('./models/Hotel'); 
 const Vehicle = require('./models/Vehicle');
-
+const User = require('./models/User');
+const { protect, admin } = require('./middleware/auth');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 5001;
@@ -23,13 +26,54 @@ mongoose.connect(process.env.MONGO_URI)
 // 1. API Route - Database eken Hotels list eka ganna (GET)
 app.get('/api/hotels', async (req, res) => {
     try {
-        const hotels = await Hotel.find(); // DB eken data gannawa
+        const hotels = await Hotel.find(); 
         res.json(hotels);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
+// AUTHENTICATION ROUTES
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET || 'wanderlanka_super_secret', { expiresIn: '30d' });
+};
+
+app.post('/api/auth/register', async (req, res) => {
+    const { email, password, role } = req.body;
+    try {
+        const userExists = await User.findOne({ email });
+        if (userExists) return res.status(400).json({ message: 'User already exists' });
+        
+        const user = await User.create({ email, password, role });
+        res.status(201).json({
+            _id: user._id,
+            email: user.email,
+            role: user.role,
+            token: generateToken(user._id)
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (user && (await user.matchPassword(password))) {
+            res.json({
+                _id: user._id,
+                email: user.email,
+                role: user.role,
+                token: generateToken(user._id)
+            });
+        } else {
+            res.status(401).json({ message: 'Invalid email or password' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 // 2. API Route - Aluth Hotel ekak DB ekata danna (POST)
 app.post('/api/hotels', async (req, res) => {
@@ -45,13 +89,18 @@ app.post('/api/hotels', async (req, res) => {
 // 3. SEED Route - Eka parak run karala lesiyenma DB ekata data danna
 app.get('/api/seed', async (req, res) => {
     try {
+        const adminExists = await User.findOne({ email: 'admin@wanderlanka.com' });
+        if (!adminExists) {
+            await User.create({ email: 'admin@wanderlanka.com', password: 'password123', role: 'admin' });
+        }
+
         const sampleHotels = [
-            { name: 'Galle Face Hotel', location: 'Colombo', price: '100000' },
-            { name: 'Cinnamon Lodge', location: 'Habarana', price: '50000' },
-            { name: 'Shangri-La', location: 'Colombo', price: '200000' } // Aluth hotel ekakuth damma
+            { name: 'Galle Face Hotel', location: 'Colombo', price: 100000 },
+            { name: 'Cinnamon Lodge', location: 'Habarana', price: 50000 },
+            { name: 'Shangri-La', location: 'Colombo', price: 200000 }
         ];
         await Hotel.insertMany(sampleHotels);
-        res.json({ message: "Hotels tika database ekata add wuna! 🎉" });
+        res.json({ message: "Admin and Hotels database ekata add wuna! 🎉 (Admin login: admin@wanderlanka.com / password123)" });
     } catch (err) {
         res.status(500).json({ message: "Data daddi error ekak!", error: err.message });
     }
@@ -159,6 +208,43 @@ app.get('/api/rider-bookings', async (req, res) => {
     try {
         const riderBookings = await RiderBooking.find().populate('riderId');
         res.status(200).json(riderBookings);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Admin Panel DELETE routes
+app.delete('/api/hotels/:id', protect, admin, async (req, res) => {
+    try {
+        await Hotel.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Hotel deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/vehicles/:id', protect, admin, async (req, res) => {
+    try {
+        await Vehicle.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Vehicle deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/bookings/:id', protect, admin, async (req, res) => {
+    try {
+        await Booking.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Booking deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/rider-bookings/:id', protect, admin, async (req, res) => {
+    try {
+        await RiderBooking.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Rider booking deleted successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

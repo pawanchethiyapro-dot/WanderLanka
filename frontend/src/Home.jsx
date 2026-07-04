@@ -8,11 +8,9 @@ function Home() {
       {/* Hero Banner Section */}
       <div style={{
         position: 'relative',
-        height: '480px',
+        height: '85vh',
         width: '100%',
-        backgroundImage: 'linear-gradient(rgba(10, 22, 40, 0.65), rgba(10, 22, 40, 0.85)), url("https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -22,26 +20,80 @@ function Home() {
         padding: '0 20px',
         boxSizing: 'border-box'
       }}>
-        <h1 style={{ 
-          color: 'white', 
-          fontSize: '52px', 
-          margin: '0 0 10px 0', 
-          textShadow: '0 4px 10px rgba(0,0,0,0.5)',
-          fontFamily: 'var(--heading)',
-          fontWeight: '800'
+        
+        {/* YouTube Video Background */}
+        <div style={{
+          position: 'absolute',
+          top: 0, left: 0, width: '100%', height: '100%',
+          zIndex: 0,
+          overflow: 'hidden',
+          backgroundColor: '#0a1628' // Fallback color
         }}>
-          Ayubowan! 🌴
-        </h1>
-        <p style={{ 
-          fontSize: '20px', 
-          maxWidth: '650px', 
-          margin: '0 0 30px 0', 
-          color: '#cbd5e1', 
-          textShadow: '0 2px 5px rgba(0,0,0,0.5)',
-          lineHeight: '1.5'
-        }}>
-          Welcome to Sri Lanka, a land of pristine beaches, lush hills, and timeless heritage. Explore premium hotels and hire local travel riders.
-        </p>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            src="/hero-bg.mp4"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              pointerEvents: 'none'
+            }}
+          ></video>
+          
+          {/* Dark Overlay to make text readable */}
+          <div style={{
+            position: 'absolute',
+            top: 0, left: 0, width: '100%', height: '100%',
+            background: 'linear-gradient(rgba(10, 22, 40, 0.4), rgba(10, 22, 40, 0.7))',
+            zIndex: 1
+          }}></div>
+        </div>
+
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <h1 style={{ 
+            color: 'white', 
+            fontSize: 'clamp(50px, 8vw, 90px)', 
+            margin: '0 0 5px 0', 
+            textShadow: '0 8px 30px rgba(0,0,0,0.8)',
+            fontFamily: 'var(--sinhala-font)',
+            fontWeight: '800',
+            letterSpacing: '2px',
+            textAlign: 'center'
+          }}>
+            ආයුබෝවන්
+          </h1>
+          <h2 style={{
+            color: 'var(--primary)',
+            fontSize: 'clamp(20px, 3.5vw, 32px)',
+            margin: '0 0 25px 0',
+            textShadow: '0 4px 15px rgba(0,0,0,0.6)',
+            fontFamily: 'var(--heading)',
+            fontWeight: '600',
+            letterSpacing: '4px',
+            textTransform: 'uppercase',
+            background: 'linear-gradient(to right, #0ea5e9, #60a5fa)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            Welcome to Sri Lanka
+          </h2>
+          <p style={{ 
+            fontSize: 'clamp(16px, 2vw, 22px)', 
+            maxWidth: '700px', 
+            margin: '0 0 40px 0', 
+            color: '#e2e8f0', 
+            textShadow: '0 4px 15px rgba(0,0,0,0.8)',
+            lineHeight: '1.6'
+          }}>
+            A land of pristine beaches, lush hills, and timeless heritage. Explore premium hotels and hire local travel riders for an unforgettable journey.
+          </p>
         <div style={{ display: 'flex', gap: '15px' }}>
           <button 
             onClick={() => navigate('/hotels')}
@@ -79,6 +131,7 @@ function Home() {
           >
             Find Travel Riders
           </button>
+        </div>
         </div>
       </div>
 
