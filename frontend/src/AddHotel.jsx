@@ -2,10 +2,12 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Building2, MapPin, DollarSign, Hotel, Mail, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import LocationPickerMap from './LocationPickerMap';
 
 function AddHotel() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [hotel, setHotel] = useState({ name: '', location: '', price: '', email: '', password: '' });
+    const [mapPosition, setMapPosition] = useState(null);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -27,6 +29,8 @@ function AddHotel() {
                 name: hotel.name,
                 location: hotel.location,
                 price: hotel.price,
+                lat: mapPosition ? mapPosition.lat : null,
+                lng: mapPosition ? mapPosition.lng : null,
                 userId: userId
             };
             await axios.post('http://localhost:5001/api/hotels', hotelData);
@@ -106,12 +110,22 @@ function AddHotel() {
                             <input 
                                 type="text"
                                 className="form-input" 
-                                placeholder="Enter location (e.g., Kandy, Ella)" 
+                                placeholder="Enter location name (e.g., Kandy, Ella)" 
                                 value={hotel.location}
                                 onChange={(e) => setHotel({...hotel, location: e.target.value})}
                                 required
                             />
                         </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="input-label">Pinpoint on Map (Optional but Recommended)</label>
+                        <LocationPickerMap position={mapPosition} setPosition={setMapPosition} />
+                        {mapPosition && (
+                            <p style={{ fontSize: '12px', color: 'var(--primary)' }}>
+                                Selected Coordinates: {mapPosition.lat.toFixed(4)}, {mapPosition.lng.toFixed(4)}
+                            </p>
+                        )}
                     </div>
 
                     <div className="input-group">

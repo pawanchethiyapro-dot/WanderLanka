@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import HotelMap from './HotelMap';
 
 function HotelList() {
     const [hotels, setHotels] = useState([]);
@@ -33,6 +34,8 @@ function HotelList() {
             <p style={{ textAlign: 'center', color: 'var(--text-light)', marginBottom: '40px', fontSize: '16px' }}>
                 Handpicked hotels and resorts across Sri Lanka for your comfort.
             </p>
+
+            <HotelMap hotels={hotels} />
 
             <div className="card-container"> 
                 {hotels.map((hotel) => (

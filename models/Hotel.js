@@ -6,6 +6,8 @@ const hotelSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     ownerName: { type: String },
     commissionRate: { type: Number, default: 10 },
+    lat: { type: Number },
+    lng: { type: Number },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 

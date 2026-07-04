@@ -95,9 +95,9 @@ app.get('/api/seed', async (req, res) => {
         }
 
         const sampleHotels = [
-            { name: 'Galle Face Hotel', location: 'Colombo', price: 100000 },
-            { name: 'Cinnamon Lodge', location: 'Habarana', price: 50000 },
-            { name: 'Shangri-La', location: 'Colombo', price: 200000 }
+            { name: 'Galle Face Hotel', location: 'Colombo', price: 100000, lat: 6.9238, lng: 79.8457 },
+            { name: 'Cinnamon Lodge', location: 'Habarana', price: 50000, lat: 8.0333, lng: 80.7500 },
+            { name: 'Shangri-La', location: 'Colombo', price: 200000, lat: 6.9280, lng: 79.8441 }
         ];
         await Hotel.insertMany(sampleHotels);
         res.json({ message: "Admin and Hotels database ekata add wuna! 🎉 (Admin login: admin@wanderlanka.com / password123)" });
