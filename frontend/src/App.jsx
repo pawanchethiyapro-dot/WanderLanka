@@ -11,8 +11,9 @@ import RiderBookingPage from './RiderBookingPage';
 import AdminPanel from './AdminPanel';
 import Partner from './Partner';
 import Login from './Login';
+import Settings from './Settings';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { LogOut } from 'lucide-react';
+import { LogOut, Settings as SettingsIcon } from 'lucide-react';
 
 const PrivateRoute = ({ children, role }) => {
     const { user, loading } = useAuth();
@@ -82,9 +83,14 @@ const Navigation = () => {
           {!user ? (
             <Link to="/login" style={navLinkStyle}>Login</Link>
           ) : (
-            <button onClick={logout} style={{ ...navLinkStyle, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444' }}>
-                <LogOut size={16} /> Logout
-            </button>
+            <>
+              <Link to="/settings" style={{ ...navLinkStyle, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <SettingsIcon size={16} /> Settings
+              </Link>
+              <button onClick={logout} style={{ ...navLinkStyle, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444' }}>
+                  <LogOut size={16} /> Logout
+              </button>
+            </>
           )}
         </div>
       </nav>
@@ -113,6 +119,11 @@ function App() {
                 </PrivateRoute>
             } />
             <Route path="/book-rider/:id" element={<RiderBookingPage />} />
+            <Route path="/settings" element={
+                <PrivateRoute>
+                    <Settings />
+                </PrivateRoute>
+            } />
             <Route path="/admin" element={
                 <PrivateRoute role="admin">
                     <AdminPanel />

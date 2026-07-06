@@ -75,6 +75,22 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+app.put('/api/auth/change-password', protect, async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    try {
+        const user = await User.findById(req.user._id);
+        if (user && (await user.matchPassword(currentPassword))) {
+            user.password = newPassword;
+            await user.save();
+            res.json({ message: 'Password updated successfully' });
+        } else {
+            res.status(401).json({ message: 'Invalid current password' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // 2. API Route - Aluth Hotel ekak DB ekata danna (POST)
 app.post('/api/hotels', async (req, res) => {
     try {
@@ -208,6 +224,25 @@ app.get('/api/rider-bookings', async (req, res) => {
     try {
         const riderBookings = await RiderBooking.find().populate('riderId');
         res.status(200).json(riderBookings);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Admin Panel PUT (Edit) routes
+app.put('/api/bookings/:id', protect, admin, async (req, res) => {
+    try {
+        const updatedBooking = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedBooking);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/rider-bookings/:id', protect, admin, async (req, res) => {
+    try {
+        const updatedBooking = await RiderBooking.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedBooking);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
