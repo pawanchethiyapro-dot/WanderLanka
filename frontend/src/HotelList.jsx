@@ -50,7 +50,16 @@ function HotelList() {
                             }}
                         />
                         <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                            <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', color: 'var(--text-h)' }}>{hotel.name}</h3>
+                            <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', color: 'var(--text-h)' }}>{hotel.name}</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontSize: '14px' }}>
+                                <span style={{ color: 'var(--accent-amber)', display: 'flex', alignItems: 'center' }}>⭐</span>
+                                <strong style={{ color: 'var(--text-h)' }}>
+                                    {hotel.averageRating > 0 ? hotel.averageRating : 'New'}
+                                </strong>
+                                {hotel.reviewCount > 0 && (
+                                    <span style={{ color: 'var(--text-light)' }}>({hotel.reviewCount} reviews)</span>
+                                )}
+                            </div>
                             <p style={{ margin: '0 0 8px 0', color: 'var(--text-light)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <span>📍</span> {hotel.location}
                             </p>

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Car, User, CreditCard, Phone, Tag, DollarSign, Bike, Camera, FileBadge, Mail, Lock } from 'lucide-react';
+import { Car, User, CreditCard, Phone, Tag, DollarSign, Bike, Camera, FileBadge, Mail, Lock, Calendar, Briefcase, Globe } from 'lucide-react';
 
 function AddVehicle() {
-    const [vehicle, setVehicle] = useState({ driverName: '', nic: '', phone: '', vehicleType: '', plateNumber: '', pricePerDay: '', email: '', password: '' });
+    const [vehicle, setVehicle] = useState({ driverName: '', nic: '', phone: '', vehicleType: '', plateNumber: '', pricePerDay: '', email: '', password: '', vehicleModel: '', driverAge: '', driverExperience: '', languages: '' });
     const [riderPhoto, setRiderPhoto] = useState(null);
     const [licensePhoto, setLicensePhoto] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -153,6 +153,66 @@ function AddVehicle() {
                                 placeholder="e.g., Tuk Tuk, Car, Van" 
                                 value={vehicle.vehicleType}
                                 onChange={(e) => setVehicle({...vehicle, vehicleType: e.target.value})}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                        <label className="input-label">Vehicle Model / Name</label>
+                        <div className="input-wrapper">
+                            <Car className="input-icon" size={20} />
+                            <input 
+                                type="text"
+                                className="form-input" 
+                                placeholder="e.g., Bajaj RE 205cc, Toyota Prius" 
+                                value={vehicle.vehicleModel}
+                                onChange={(e) => setVehicle({...vehicle, vehicleModel: e.target.value})}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="input-label">Driver Age</label>
+                        <div className="input-wrapper">
+                            <Calendar className="input-icon" size={20} />
+                            <input 
+                                type="number"
+                                className="form-input" 
+                                placeholder="e.g., 32" 
+                                value={vehicle.driverAge}
+                                onChange={(e) => setVehicle({...vehicle, driverAge: e.target.value})}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="input-label">Experience (Years)</label>
+                        <div className="input-wrapper">
+                            <Briefcase className="input-icon" size={20} />
+                            <input 
+                                type="number"
+                                className="form-input" 
+                                placeholder="e.g., 5" 
+                                value={vehicle.driverExperience}
+                                onChange={(e) => setVehicle({...vehicle, driverExperience: e.target.value})}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                        <label className="input-label">Languages Spoken</label>
+                        <div className="input-wrapper">
+                            <Globe className="input-icon" size={20} />
+                            <input 
+                                type="text"
+                                className="form-input" 
+                                placeholder="e.g., Sinhala, English, Tamil" 
+                                value={vehicle.languages}
+                                onChange={(e) => setVehicle({...vehicle, languages: e.target.value})}
                                 required
                             />
                         </div>

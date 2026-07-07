@@ -6,6 +6,7 @@ require('dotenv').config();
 const Hotel = require('./models/Hotel'); 
 const Vehicle = require('./models/Vehicle');
 const User = require('./models/User');
+const Review = require('./models/Review');
 const { protect, admin } = require('./middleware/auth');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -27,7 +28,17 @@ mongoose.connect(process.env.MONGO_URI)
 app.get('/api/hotels', async (req, res) => {
     try {
         const hotels = await Hotel.find(); 
-        res.json(hotels);
+        const hotelsWithRatings = await Promise.all(hotels.map(async (hotel) => {
+            const reviews = await Review.find({ itemType: 'Hotel', itemId: hotel._id });
+            const reviewCount = reviews.length;
+            const averageRating = reviewCount > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount).toFixed(1) : 0;
+            return {
+                ...hotel.toObject(),
+                averageRating: Number(averageRating),
+                reviewCount
+            };
+        }));
+        res.json(hotelsWithRatings);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -151,8 +162,11 @@ const upload = multer({ storage });
 // Vehicle register karana route eka (photos dekath ekka)
 app.post('/api/vehicles', upload.fields([{ name: 'riderPhoto', maxCount: 1 }, { name: 'licensePhoto', maxCount: 1 }]), async (req, res) => {
     try {
+        const { driverAge, driverExperience, ...rest } = req.body;
         const newVehicle = new Vehicle({
-            ...req.body,
+            ...rest,
+            driverAge: driverAge ? Number(driverAge) : undefined,
+            driverExperience: driverExperience ? Number(driverExperience) : undefined,
             riderPhoto: req.files && req.files['riderPhoto'] ? req.files['riderPhoto'][0].path : null,
             licensePhoto: req.files && req.files['licensePhoto'] ? req.files['licensePhoto'][0].path : null
         });
@@ -167,7 +181,17 @@ app.post('/api/vehicles', upload.fields([{ name: 'riderPhoto', maxCount: 1 }, { 
 app.get('/api/vehicles', async (req, res) => {
     try {
         const vehicles = await Vehicle.find(); // Vehicle model eka use karala database eken data ganna
-        res.status(200).json(vehicles);
+        const vehiclesWithRatings = await Promise.all(vehicles.map(async (vehicle) => {
+            const reviews = await Review.find({ itemType: 'Vehicle', itemId: vehicle._id });
+            const reviewCount = reviews.length;
+            const averageRating = reviewCount > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount).toFixed(1) : 0;
+            return {
+                ...vehicle.toObject(),
+                averageRating: Number(averageRating),
+                reviewCount
+            };
+        }));
+        res.status(200).json(vehiclesWithRatings);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -177,7 +201,17 @@ app.get('/api/vehicles', async (req, res) => {
 app.get('/api/hotels', async (req, res) => {
     try {
         const hotels = await Hotel.find();
-        res.status(200).json(hotels);
+        const hotelsWithRatings = await Promise.all(hotels.map(async (hotel) => {
+            const reviews = await Review.find({ itemType: 'Hotel', itemId: hotel._id });
+            const reviewCount = reviews.length;
+            const averageRating = reviewCount > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount).toFixed(1) : 0;
+            return {
+                ...hotel.toObject(),
+                averageRating: Number(averageRating),
+                reviewCount
+            };
+        }));
+        res.status(200).json(hotelsWithRatings);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -280,6 +314,43 @@ app.delete('/api/rider-bookings/:id', protect, admin, async (req, res) => {
     try {
         await RiderBooking.findByIdAndDelete(req.params.id);
         res.json({ message: 'Rider booking deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Reviews API Routes
+app.post('/api/reviews', async (req, res) => {
+    const { itemType, itemId, customerName, rating, comment } = req.body;
+    if (!itemType || !itemId || !customerName || !rating || !comment) {
+        return res.status(400).json({ error: 'Please provide all review details.' });
+    }
+    try {
+        const newReview = new Review({
+            itemType,
+            itemId,
+            customerName,
+            rating: Number(rating),
+            comment
+        });
+        await newReview.save();
+        res.status(201).json({ message: 'Review added successfully!', review: newReview });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/reviews/:itemType/:itemId', async (req, res) => {
+    const { itemType, itemId } = req.params;
+    try {
+        const reviews = await Review.find({ itemType, itemId }).sort({ createdAt: -1 });
+        const reviewCount = reviews.length;
+        const averageRating = reviewCount > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount).toFixed(1) : 0;
+        res.status(200).json({
+            reviews,
+            averageRating: Number(averageRating),
+            reviewCount
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

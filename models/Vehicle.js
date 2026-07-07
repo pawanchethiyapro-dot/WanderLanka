@@ -10,7 +10,11 @@ const vehicleSchema = new mongoose.Schema({
     status: { type: String, default: 'available' },
     licensePhoto: { type: String }, // For Driving License
     riderPhoto: { type: String },    // For Rider Profile Picture
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    vehicleModel: { type: String },
+    driverAge: { type: Number },
+    driverExperience: { type: Number },
+    languages: { type: String }
 });
 
 module.exports = mongoose.model('Vehicle', vehicleSchema);

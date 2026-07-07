@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ReviewSection from './ReviewSection';
 
 function BookingPage() {
     const { id } = useParams();
@@ -38,11 +39,12 @@ function BookingPage() {
         <div style={{ 
             padding: '60px 20px', 
             display: 'flex', 
-            justifyContent: 'center', 
+            flexDirection: 'column',
             alignItems: 'center',
             background: 'var(--bg)',
             minHeight: 'calc(100vh - 80px)',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            gap: '30px'
         }}>
             <div className="card" style={{ 
                 width: '100%', 
@@ -110,6 +112,10 @@ function BookingPage() {
                         Confirm Hotel Booking
                     </button>
                 </form>
+            </div>
+
+            <div style={{ width: '100%', maxWidth: '600px' }}>
+                <ReviewSection itemType="Hotel" itemId={id} />
             </div>
         </div>
     );
