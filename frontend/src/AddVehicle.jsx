@@ -40,9 +40,7 @@ function AddVehicle() {
                 formData.append('licensePhoto', licensePhoto);
             }
 
-            await axios.post('http://localhost:5001/api/vehicles', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            await axios.post('http://localhost:5001/api/vehicles', formData);
             alert('Rider registered successfully! Please login.');
             navigate('/login'); 
 

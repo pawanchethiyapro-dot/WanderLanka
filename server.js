@@ -10,6 +10,16 @@ const Review = require('./models/Review');
 const { protect, admin } = require('./middleware/auth');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+
+// Image save karana folder eka hadamu
+const storage = multer.diskStorage({
+  destination: './uploads/',
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage });
 
 const app = express();
 const PORT = 5001;
@@ -103,11 +113,20 @@ app.put('/api/auth/change-password', protect, async (req, res) => {
 });
 
 // 2. API Route - Aluth Hotel ekak DB ekata danna (POST)
-app.post('/api/hotels', async (req, res) => {
+app.post('/api/hotels', upload.single('hotelPhoto'), async (req, res) => {
     try {
-        const newHotel = new Hotel(req.body);
+        console.log('--- HOTEL REGISTER REQUEST ---');
+        console.log('Body:', req.body);
+        console.log('File:', req.file);
+        
+        const { starRating, ...rest } = req.body;
+        const newHotel = new Hotel({
+            ...rest,
+            starRating: starRating ? Number(starRating) : undefined,
+            hotelPhoto: req.file ? req.file.path : null
+        });
         const savedHotel = await newHotel.save();
-        res.json(savedHotel);
+        res.status(201).json(savedHotel);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -133,31 +152,12 @@ app.get('/api/seed', async (req, res) => {
     }
 });
 
-
-app.post('/api/hotels', async (req, res) => {
-    try {
-        const newHotel = new Hotel(req.body);
-        await newHotel.save();
-        res.status(201).json({ message: "Hotel registered successfully!" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
 // Server eka start kireema
 app.listen(PORT, () => {
     console.log(`Backend server eka weda! Port: ${PORT}`);
 });
 
-const multer = require('multer');
 
-// Image save karana folder eka hadamu
-const storage = multer.diskStorage({
-  destination: './uploads/',
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage });
 
 // Vehicle register karana route eka (photos dekath ekka)
 app.post('/api/vehicles', upload.fields([{ name: 'riderPhoto', maxCount: 1 }, { name: 'licensePhoto', maxCount: 1 }]), async (req, res) => {

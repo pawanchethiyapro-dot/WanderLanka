@@ -15,6 +15,9 @@ function HotelList() {
 
     // Placeholder image in case hotel doesn't have a valid one
     const getHotelImage = (hotel) => {
+        if (hotel.hotelPhoto) {
+            return `http://localhost:5001/${hotel.hotelPhoto}`;
+        }
         if (hotel.licensePhoto) {
             return `http://localhost:5001/${hotel.licensePhoto}`;
         }
@@ -50,7 +53,12 @@ function HotelList() {
                             }}
                         />
                         <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                            <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', color: 'var(--text-h)' }}>{hotel.name}</h3>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '4px', marginBottom: '5px' }}>
+                                <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-h)' }}>{hotel.name}</h3>
+                                <div style={{ fontSize: '12px', color: 'var(--accent-amber)', letterSpacing: '1px', fontWeight: '700' }}>
+                                    {Array.from({ length: Number(hotel.starRating) || 5 }, (_, i) => '★').join('')} Class
+                                </div>
+                            </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontSize: '14px' }}>
                                 <span style={{ color: 'var(--accent-amber)', display: 'flex', alignItems: 'center' }}>⭐</span>
                                 <strong style={{ color: 'var(--text-h)' }}>
@@ -63,6 +71,26 @@ function HotelList() {
                             <p style={{ margin: '0 0 8px 0', color: 'var(--text-light)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <span>📍</span> {hotel.location}
                             </p>
+                            {hotel.website && (
+                                <a 
+                                    href={hotel.website} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{ 
+                                        color: 'var(--primary)', 
+                                        textDecoration: 'none', 
+                                        fontSize: '13px', 
+                                        display: 'inline-flex', 
+                                        alignItems: 'center', 
+                                        gap: '4px',
+                                        marginBottom: '12px',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    🌐 Visit Website
+                                </a>
+                            )}
                             <p style={{ margin: '0 0 20px 0', color: 'var(--primary)', fontWeight: '700', fontSize: '18px' }}>
                                 Rs. {hotel.price ? Number(hotel.price).toLocaleString() : 'N/A'} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ night</span>
                             </p>

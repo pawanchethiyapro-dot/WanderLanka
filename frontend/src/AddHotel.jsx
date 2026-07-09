@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Building2, MapPin, DollarSign, Hotel, Mail, Lock } from 'lucide-react';
+import { Building2, MapPin, DollarSign, Hotel, Mail, Lock, Star, Globe, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import LocationPickerMap from './LocationPickerMap';
 
 function AddHotel() {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [hotel, setHotel] = useState({ name: '', location: '', price: '', email: '', password: '' });
+    const [hotel, setHotel] = useState({ name: '', location: '', price: '', email: '', password: '', starRating: '5', website: '' });
+    const [hotelPhoto, setHotelPhoto] = useState(null);
     const [mapPosition, setMapPosition] = useState(null);
     const navigate = useNavigate();
 
@@ -24,19 +25,25 @@ function AddHotel() {
             });
             const userId = userRes.data._id;
 
-            // 2. Register Hotel Profile
-            const hotelData = {
-                name: hotel.name,
-                location: hotel.location,
-                price: hotel.price,
-                lat: mapPosition ? mapPosition.lat : null,
-                lng: mapPosition ? mapPosition.lng : null,
-                userId: userId
-            };
-            await axios.post('http://localhost:5001/api/hotels', hotelData);
+            // 2. Register Hotel Profile using FormData
+            const formData = new FormData();
+            formData.append('name', hotel.name);
+            formData.append('location', hotel.location);
+            formData.append('price', hotel.price);
+            formData.append('lat', mapPosition ? mapPosition.lat : '');
+            formData.append('lng', mapPosition ? mapPosition.lng : '');
+            formData.append('starRating', hotel.starRating);
+            formData.append('website', hotel.website);
+            formData.append('userId', userId);
+            
+            if (hotelPhoto) {
+                formData.append('hotelPhoto', hotelPhoto);
+            }
+
+            await axios.post('http://localhost:5001/api/hotels', formData);
             
             alert('Hotel registered successfully! Please login.');
-            navigate('/login'); // We will create this page next
+            navigate('/login');
         } catch (err) {
             alert(err.response?.data?.message || 'Error adding hotel');
             console.error(err);
@@ -138,6 +145,55 @@ function AddHotel() {
                                 placeholder="e.g., 5000" 
                                 value={hotel.price}
                                 onChange={(e) => setHotel({...hotel, price: e.target.value})}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="input-label">Hotel Class (Star Rating)</label>
+                        <div className="input-wrapper">
+                            <Star className="input-icon" size={20} />
+                            <select 
+                                className="form-input" 
+                                value={hotel.starRating}
+                                onChange={(e) => setHotel({...hotel, starRating: e.target.value})}
+                                required
+                                style={{ width: '100%', appearance: 'none', background: 'var(--card-bg)' }}
+                            >
+                                <option value="1">1 Star</option>
+                                <option value="2">2 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="5">5 Stars</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="input-label">Website URL</label>
+                        <div className="input-wrapper">
+                            <Globe className="input-icon" size={20} />
+                            <input 
+                                type="url"
+                                className="form-input" 
+                                placeholder="https://example.com" 
+                                value={hotel.website}
+                                onChange={(e) => setHotel({...hotel, website: e.target.value})}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="input-label">Hotel Photo</label>
+                        <div className="input-wrapper">
+                            <Camera className="input-icon" size={20} />
+                            <input 
+                                type="file"
+                                accept="image/*"
+                                className="form-input" 
+                                onChange={(e) => setHotelPhoto(e.target.files[0])}
+                                style={{ padding: '0.6rem 0.5rem 0.5rem 2.8rem' }}
                                 required
                             />
                         </div>

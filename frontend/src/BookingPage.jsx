@@ -62,13 +62,42 @@ function BookingPage() {
                 {hotel && (
                     <div style={{ 
                         background: 'var(--accent-bg)', 
-                        padding: '12px 16px', 
+                        padding: '16px 20px', 
                         borderRadius: '8px', 
                         marginBottom: '25px', 
-                        borderLeft: '4px solid var(--primary)' 
+                        borderLeft: '4px solid var(--primary)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px'
                     }}>
-                        <h4 style={{ margin: '0 0 4px 0', color: 'var(--text-h)' }}>{hotel.name}</h4>
-                        <p style={{ margin: '0', fontSize: '13px', color: 'var(--text-light)' }}>📍 {hotel.location} • Rs. {Number(hotel.price).toLocaleString()} / Night</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h4 style={{ margin: 0, color: 'var(--text-h)', fontSize: '18px' }}>{hotel.name}</h4>
+                            <div style={{ fontSize: '12px', color: 'var(--accent-amber)', letterSpacing: '1px', fontWeight: '700' }}>
+                                {Array.from({ length: Number(hotel.starRating) || 5 }, (_, i) => '★').join('')} Class
+                            </div>
+                        </div>
+                        <p style={{ margin: '0', fontSize: '14px', color: 'var(--text)' }}>📍 {hotel.location}</p>
+                        {hotel.website && (
+                            <a 
+                                href={hotel.website} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                style={{ 
+                                    color: 'var(--primary)', 
+                                    textDecoration: 'none', 
+                                    fontSize: '13px', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: '4px',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                🌐 Visit Website
+                            </a>
+                        )}
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px', fontWeight: '700', color: 'var(--primary)' }}>
+                            Rs. {Number(hotel.price).toLocaleString()} <span style={{ fontWeight: 'normal', color: 'var(--text-light)', fontSize: '13px' }}>/ night</span>
+                        </p>
                     </div>
                 )}
 
