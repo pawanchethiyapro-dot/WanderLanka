@@ -9,6 +9,28 @@ function RiderList() {
     const [selectedRider, setSelectedRider] = useState(null);
     const [selectedRiderReviews, setSelectedRiderReviews] = useState([]);
 
+    const [searchTerm, setSearchTerm] = useState('');
+    const [typeFilter, setTypeFilter] = useState('all');
+    const [maxPrice, setMaxPrice] = useState('');
+    const [sortBy, setSortBy] = useState('default');
+
+    const filteredRiders = riders
+        .filter(r => {
+            const searchLower = searchTerm.toLowerCase();
+            const matchesSearch = r.driverName.toLowerCase().includes(searchLower) || 
+                                  r.vehicleType.toLowerCase().includes(searchLower) ||
+                                  (r.vehicleModel && r.vehicleModel.toLowerCase().includes(searchLower)) ||
+                                  (r.languages && r.languages.toLowerCase().includes(searchLower));
+            const matchesType = typeFilter === 'all' || r.vehicleType.toLowerCase().includes(typeFilter.toLowerCase());
+            const matchesMaxPrice = !maxPrice || Number(r.pricePerDay) <= Number(maxPrice);
+            return matchesSearch && matchesType && matchesMaxPrice;
+        })
+        .sort((a, b) => {
+            if (sortBy === 'price-asc') return a.pricePerDay - b.pricePerDay;
+            if (sortBy === 'price-desc') return b.pricePerDay - a.pricePerDay;
+            return 0;
+        });
+
     const fetchRiders = async () => {
         try {
             const res = await axios.get('http://localhost:5001/api/vehicles');
@@ -63,8 +85,84 @@ function RiderList() {
                 Hire local, verified drivers to explore Sri Lanka at your own pace.
             </p>
 
+            {/* Filter Bar */}
+            <div className="card" style={{
+                padding: '20px',
+                marginBottom: '30px',
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid var(--border)',
+                borderRadius: '16px',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '15px',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+            }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', flexGrow: 1 }}>
+                    {/* Search Input */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '200px', flexGrow: 1 }}>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Search</label>
+                        <input 
+                            type="text" 
+                            placeholder="Search by driver, vehicle model, or language..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{ width: '100%', boxSizing: 'border-box' }}
+                        />
+                    </div>
+
+                    {/* Vehicle Type Dropdown */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '150px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Vehicle Type</label>
+                        <select 
+                            value={typeFilter}
+                            onChange={(e) => setTypeFilter(e.target.value)}
+                            style={{ width: '100%', background: 'var(--card-bg)', appearance: 'none', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--text)' }}
+                        >
+                            <option value="all">🚗 All Types</option>
+                            <option value="tuk">🛺 Tuk Tuk</option>
+                            <option value="car">🚗 Car (Sedan/hatchback)</option>
+                            <option value="van">🚐 Van</option>
+                            <option value="suv">🚙 SUV / Jeep</option>
+                        </select>
+                    </div>
+
+                    {/* Max Price Range */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '150px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Max Price (LKR / Day)</label>
+                        <input 
+                            type="number" 
+                            placeholder="e.g. 15000" 
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                            style={{ width: '100%', boxSizing: 'border-box' }}
+                        />
+                    </div>
+                </div>
+
+                {/* Sort By Option */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '150px' }}>
+                    <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sort By</label>
+                    <select 
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        style={{ width: '100%', background: 'var(--card-bg)', appearance: 'none', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--text)' }}
+                    >
+                        <option value="default">✨ Default</option>
+                        <option value="price-asc">💵 Price: Low to High</option>
+                        <option value="price-desc">📈 Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* Results count indicator */}
+            <div style={{ color: 'var(--text-light)', fontSize: '14px', marginBottom: '20px' }}>
+                Showing {filteredRiders.length} verified driver{filteredRiders.length !== 1 ? 's' : ''} in Sri Lanka
+            </div>
+
             <div className="card-container"> 
-                {riders.map((r) => (
+                {filteredRiders.map((r) => (
                     <div 
                         key={r._id} 
                         className="card" 

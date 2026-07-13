@@ -9,6 +9,27 @@ function HotelList() {
     const [selectedHotel, setSelectedHotel] = useState(null);
     const [selectedHotelReviews, setSelectedHotelReviews] = useState([]);
 
+    const [searchTerm, setSearchTerm] = useState('');
+    const [starFilter, setStarFilter] = useState('all');
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+    const [sortBy, setSortBy] = useState('default');
+
+    const filteredHotels = hotels
+        .filter(hotel => {
+            const matchesSearch = hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                  hotel.location.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesStar = starFilter === 'all' || Number(hotel.starRating) === Number(starFilter);
+            const matchesMinPrice = !minPrice || Number(hotel.price) >= Number(minPrice);
+            const matchesMaxPrice = !maxPrice || Number(hotel.price) <= Number(maxPrice);
+            return matchesSearch && matchesStar && matchesMinPrice && matchesMaxPrice;
+        })
+        .sort((a, b) => {
+            if (sortBy === 'price-asc') return a.price - b.price;
+            if (sortBy === 'price-desc') return b.price - a.price;
+            return 0;
+        });
+
     useEffect(() => {
         fetch('http://localhost:5001/api/hotels')
             .then(response => response.json())
@@ -57,10 +78,97 @@ function HotelList() {
                 Handpicked hotels and resorts across Sri Lanka for your comfort.
             </p>
 
-            <HotelMap hotels={hotels} />
+            {/* Filter Bar */}
+            <div className="card" style={{
+                padding: '20px',
+                marginBottom: '30px',
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid var(--border)',
+                borderRadius: '16px',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '15px',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+            }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', flexGrow: 1 }}>
+                    {/* Search Input */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '200px', flexGrow: 1 }}>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Search</label>
+                        <input 
+                            type="text" 
+                            placeholder="Search by hotel or location..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{ width: '100%', boxSizing: 'border-box' }}
+                        />
+                    </div>
+
+                    {/* Star Rating Dropdown */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '130px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Star Class</label>
+                        <select 
+                            value={starFilter}
+                            onChange={(e) => setStarFilter(e.target.value)}
+                            style={{ width: '100%', background: 'var(--card-bg)', appearance: 'none', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--text)' }}
+                        >
+                            <option value="all">⭐ All Stays</option>
+                            <option value="1">1 Star</option>
+                            <option value="2">2 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="5">5 Stars</option>
+                        </select>
+                    </div>
+
+                    {/* Price Range */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '200px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Price per Night (LKR)</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <input 
+                                type="number" 
+                                placeholder="Min" 
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(e.target.value)}
+                                style={{ width: '100%', boxSizing: 'border-box' }}
+                            />
+                            <span style={{ color: 'var(--text-light)' }}>-</span>
+                            <input 
+                                type="number" 
+                                placeholder="Max" 
+                                value={maxPrice}
+                                onChange={(e) => setMaxPrice(e.target.value)}
+                                style={{ width: '100%', boxSizing: 'border-box' }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sort By Option */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '150px' }}>
+                    <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-h)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sort By</label>
+                    <select 
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        style={{ width: '100%', background: 'var(--card-bg)', appearance: 'none', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--text)' }}
+                    >
+                        <option value="default">✨ Default</option>
+                        <option value="price-asc">💵 Price: Low to High</option>
+                        <option value="price-desc">📈 Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <HotelMap hotels={filteredHotels} />
+
+            {/* Results count indicator */}
+            <div style={{ color: 'var(--text-light)', fontSize: '14px', marginBottom: '20px', marginTop: '10px' }}>
+                Showing {filteredHotels.length} stay{filteredHotels.length !== 1 ? 's' : ''} in Sri Lanka
+            </div>
 
             <div className="card-container"> 
-                {hotels.map((hotel) => (
+                {filteredHotels.map((hotel) => (
                     <div 
                         key={hotel._id} 
                         className="card" 
