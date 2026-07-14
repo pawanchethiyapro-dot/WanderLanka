@@ -186,3 +186,12 @@ button:hover, .btn-primary:hover {
   padding: 40px;
   box-shadow: var(--shadow);
 }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

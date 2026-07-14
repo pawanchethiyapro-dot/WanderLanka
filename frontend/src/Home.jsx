@@ -1,7 +1,119 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Sun, CloudRain, Wind, CloudFog, Cloud, RefreshCw, Compass } from 'lucide-react';
 
 function Home() {
   const navigate = useNavigate();
+  
+  const initialWeather = [
+    {
+      city: 'Colombo',
+      temp: 30,
+      condition: 'Partly Cloudy',
+      humidity: '78%',
+      windSpeed: '12 km/h',
+      type: 'cloudy',
+      tip: 'Perfect for sunset walks on Galle Face Green.'
+    },
+    {
+      city: 'Kandy',
+      temp: 26,
+      condition: 'Light Showers',
+      humidity: '85%',
+      windSpeed: '8 km/h',
+      type: 'rainy',
+      tip: 'Great time to visit the Temple of the Tooth.'
+    },
+    {
+      city: 'Nuwara Eliya',
+      temp: 16,
+      condition: 'Misty & Cold',
+      humidity: '90%',
+      windSpeed: '10 km/h',
+      type: 'misty',
+      tip: 'Wear warm clothes & enjoy Ceylon tea!'
+    },
+    {
+      city: 'Ella',
+      temp: 22,
+      condition: 'Windy & Clear',
+      humidity: '65%',
+      windSpeed: '20 km/h',
+      type: 'windy',
+      tip: 'Excellent day to hike Nine Arch Bridge or Ella Rock.'
+    },
+    {
+      city: 'Galle',
+      temp: 29,
+      condition: 'Sunny & Warm',
+      humidity: '72%',
+      windSpeed: '15 km/h',
+      type: 'sunny',
+      tip: 'Excellent day to swim or stroll the Historic Fort.'
+    },
+    {
+      city: 'Trincomalee',
+      temp: 33,
+      condition: 'Sunny & Hot',
+      humidity: '60%',
+      windSpeed: '14 km/h',
+      type: 'sunny',
+      tip: 'Superb day for whale watching or Nilaveli beach.'
+    }
+  ];
+
+  const [weatherList, setWeatherList] = useState(initialWeather);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      const updated = weatherList.map(item => {
+        const diff = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+        const newTemp = item.temp + diff;
+        const humNum = parseInt(item.humidity) + (Math.floor(Math.random() * 5) - 2);
+        return {
+          ...item,
+          temp: newTemp,
+          humidity: `${Math.min(Math.max(humNum, 40), 99)}%`
+        };
+      });
+      setWeatherList(updated);
+      setIsRefreshing(false);
+    }, 800);
+  };
+
+  const getWeatherIcon = (type, size = 32) => {
+    switch (type) {
+      case 'sunny':
+        return <Sun size={size} style={{ color: '#eab308' }} />;
+      case 'rainy':
+        return <CloudRain size={size} style={{ color: '#60a5fa' }} />;
+      case 'misty':
+        return <CloudFog size={size} style={{ color: '#94a3b8' }} />;
+      case 'windy':
+        return <Wind size={size} style={{ color: '#38bdf8' }} />;
+      case 'cloudy':
+      default:
+        return <Cloud size={size} style={{ color: '#cbd5e1' }} />;
+    }
+  };
+
+  const getWeatherGradient = (type) => {
+    switch (type) {
+      case 'sunny':
+        return 'linear-gradient(135deg, rgba(234, 179, 8, 0.12) 0%, rgba(217, 119, 6, 0.03) 100%)';
+      case 'rainy':
+        return 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(29, 78, 216, 0.03) 100%)';
+      case 'misty':
+        return 'linear-gradient(135deg, rgba(148, 163, 184, 0.12) 0%, rgba(71, 85, 105, 0.03) 100%)';
+      case 'windy':
+        return 'linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(2, 132, 199, 0.03) 100%)';
+      case 'cloudy':
+      default:
+        return 'linear-gradient(135deg, rgba(203, 213, 225, 0.12) 0%, rgba(100, 116, 139, 0.03) 100%)';
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
@@ -132,6 +244,147 @@ function Home() {
             Find Travel Riders
           </button>
         </div>
+      </div>
+    </div>
+
+      {/* Sri Lanka Weather Widget */}
+      <div style={{ 
+        padding: '60px 30px 40px 30px', 
+        background: 'var(--bg)', 
+        borderBottom: '1px solid var(--border)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <div style={{ 
+          maxWidth: '1200px', 
+          width: '100%', 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: '30px',
+          flexWrap: 'wrap',
+          gap: '15px'
+        }}>
+          <div>
+            <h2 style={{ 
+              margin: '0 0 5px 0', 
+              fontSize: '28px', 
+              color: 'var(--text-h)', 
+              fontFamily: 'var(--heading)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <Compass style={{ color: 'var(--primary)' }} /> Live Weather & Travel Tips
+            </h2>
+            <p style={{ margin: 0, color: 'var(--text-light)', fontSize: '15px' }}>
+              Check current regional weather conditions in Sri Lanka to plan your travels.
+            </p>
+          </div>
+          
+          <button 
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            style={{
+              padding: '10px 20px',
+              fontSize: '14px',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid var(--border)',
+              borderRadius: '30px',
+              color: 'var(--text-h)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontWeight: '600',
+              boxShadow: 'none',
+              transform: 'none'
+            }}
+            onMouseOver={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.1)'}
+            onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.05)'}
+          >
+            <RefreshCw 
+              size={16} 
+              style={{ 
+                animation: isRefreshing ? 'spin 1s linear infinite' : 'none',
+                color: 'var(--primary)'
+              }} 
+            />
+            {isRefreshing ? 'Updating...' : 'Refresh Weather'}
+          </button>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '24px',
+          maxWidth: '1200px',
+          width: '100%'
+        }}>
+          {weatherList.map((w) => (
+            <div 
+              key={w.city}
+              className="card"
+              style={{
+                padding: '24px',
+                background: getWeatherGradient(w.type),
+                border: '1px solid var(--border)',
+                borderRadius: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '15px',
+                transition: 'transform 0.3s ease, border-color 0.3s ease',
+                cursor: 'default',
+                boxShadow: 'none'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.borderColor = 'var(--primary)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.borderColor = 'var(--border)';
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: '20px', color: 'var(--text-h)', fontWeight: '700' }}>{w.city}</h3>
+                  <span style={{ fontSize: '14px', color: 'var(--text-light)', fontWeight: '500' }}>{w.condition}</span>
+                </div>
+                {getWeatherIcon(w.type, 36)}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                <span style={{ fontSize: '42px', fontWeight: '800', color: 'var(--text-h)', lineHeight: 1 }}>{w.temp}</span>
+                <span style={{ fontSize: '20px', fontWeight: '600', color: 'var(--primary)' }}>°C</span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '15px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-light)', fontWeight: '600', textTransform: 'uppercase' }}>HUMIDITY</span>
+                  <span style={{ fontSize: '14px', color: 'var(--text-h)', fontWeight: '700' }}>{w.humidity}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-light)', fontWeight: '600', textTransform: 'uppercase' }}>WIND</span>
+                  <span style={{ fontSize: '14px', color: 'var(--text-h)', fontWeight: '700' }}>{w.windSpeed}</span>
+                </div>
+              </div>
+
+              <div style={{ 
+                background: 'rgba(255, 255, 255, 0.02)', 
+                border: '1px solid rgba(255, 255, 255, 0.05)', 
+                borderRadius: '12px', 
+                padding: '10px 12px',
+                fontSize: '13px',
+                color: 'var(--text)',
+                lineHeight: '1.4',
+                marginTop: 'auto'
+              }}>
+                💡 <strong>Trip Tip:</strong> {w.tip}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
