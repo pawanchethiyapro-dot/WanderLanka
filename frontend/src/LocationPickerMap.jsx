@@ -31,10 +31,21 @@ function LocationMarker({ position, setPosition }) {
 
 function LocationPickerMap({ position, setPosition }) {
     const defaultCenter = [7.8731, 80.7718]; // Center of Sri Lanka
+    const sriLankaBounds = [
+        [5.5, 79.0], // Southwest
+        [10.0, 82.5] // Northeast
+    ];
 
     return (
         <div style={{ height: '300px', width: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)', marginBottom: '15px' }}>
-            <MapContainer center={defaultCenter} zoom={7} style={{ height: '100%', width: '100%' }}>
+            <MapContainer 
+                center={defaultCenter} 
+                zoom={7.5} 
+                minZoom={7} 
+                maxBounds={sriLankaBounds} 
+                maxBoundsViscosity={1.0} 
+                style={{ height: '100%', width: '100%' }}
+            >
                 <TileLayer
                     attribution='&copy; OpenStreetMap contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

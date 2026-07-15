@@ -20,6 +20,12 @@ L.Marker.prototype.options.icon = DefaultIcon;
 function HotelMap({ hotels }) {
     const navigate = useNavigate();
 
+    // Bounds for Sri Lanka
+    const sriLankaBounds = [
+        [5.5, 79.0], // Southwest
+        [10.0, 82.5] // Northeast
+    ];
+
     // Default center to Sri Lanka
     const defaultCenter = [7.8731, 80.7718];
 
@@ -28,7 +34,14 @@ function HotelMap({ hotels }) {
 
     return (
         <div style={{ height: '400px', width: '100%', borderRadius: '15px', overflow: 'hidden', boxShadow: 'var(--shadow)', marginBottom: '40px' }}>
-            <MapContainer center={defaultCenter} zoom={7} style={{ height: '100%', width: '100%' }}>
+            <MapContainer 
+                center={defaultCenter} 
+                zoom={7.5} 
+                minZoom={7} 
+                maxBounds={sriLankaBounds} 
+                maxBoundsViscosity={1.0} 
+                style={{ height: '100%', width: '100%' }}
+            >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

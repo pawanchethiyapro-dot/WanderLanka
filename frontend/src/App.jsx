@@ -14,6 +14,7 @@ import Login from './Login';
 import Settings from './Settings';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LogOut, Settings as SettingsIcon } from 'lucide-react';
+import ItineraryPlanner from './ItineraryPlanner';
 
 const PrivateRoute = ({ children, role }) => {
     const { user, loading } = useAuth();
@@ -60,6 +61,7 @@ const Navigation = () => {
           <Link to="/" className="nav-link" style={navLinkStyle}>Home</Link>
           <Link to="/hotels" className="nav-link" style={navLinkStyle}>View Hotels</Link>
           <Link to="/riders" className="nav-link" style={navLinkStyle}>View Riders</Link>
+          <Link to="/itinerary" className="nav-link" style={navLinkStyle}>Route Planner</Link>
           {!user && <Link to="/partner" className="nav-link" style={navLinkStyle}>Partner With Us</Link>}
           
           {user?.role === 'admin' && (
@@ -108,6 +110,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/hotels" element={<HotelList />} />
+            <Route path="/itinerary" element={<ItineraryPlanner />} />
             <Route path="/partner" element={<Partner />} />
             <Route path="/register-hotel" element={<AddHotel />} />
             <Route path="/riders" element={<RiderList />} />

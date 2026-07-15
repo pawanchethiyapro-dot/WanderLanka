@@ -195,3 +195,7 @@ button:hover, .btn-primary:hover {
     transform: rotate(360deg);
   }
 }
+
+.leaflet-container {
+  background: var(--bg) !important;
+}
