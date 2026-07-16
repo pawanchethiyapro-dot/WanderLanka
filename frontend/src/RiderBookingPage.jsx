@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ReviewSection from './ReviewSection';
+import { useCurrency } from './context/CurrencyContext';
 
 function RiderBookingPage() {
+  const { convertPrice } = useCurrency();
   const { id } = useParams();
   const navigate = useNavigate();
   const [rider, setRider] = useState(null);
@@ -81,7 +83,7 @@ function RiderBookingPage() {
                       </p>
                     )}
                     <p style={{ margin: '0', fontSize: '13px', color: 'var(--text-light)' }}>
-                      <strong>💰 Price:</strong> Rs. {Number(rider.pricePerDay).toLocaleString()} / Day
+                      <strong>💰 Price:</strong> {convertPrice(rider.pricePerDay)} / Day
                     </p>
                 </div>
             )}

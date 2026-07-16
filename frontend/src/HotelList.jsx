@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HotelMap from './HotelMap';
 import { X, Star } from 'lucide-react';
+import { useCurrency } from './context/CurrencyContext';
 
 function HotelList() {
+    const { convertPrice } = useCurrency();
     const [hotels, setHotels] = useState([]);
     const navigate = useNavigate();
     const [selectedHotel, setSelectedHotel] = useState(null);
@@ -224,7 +226,7 @@ function HotelList() {
                                 </a>
                             )}
                             <p style={{ margin: '0 0 20px 0', color: 'var(--primary)', fontWeight: '700', fontSize: '18px' }}>
-                                Rs. {hotel.price ? Number(hotel.price).toLocaleString() : 'N/A'} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ night</span>
+                                {hotel.price ? convertPrice(hotel.price) : 'N/A'} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ night</span>
                             </p>
                             <button 
                                 onClick={(e) => {
@@ -357,7 +359,7 @@ function HotelList() {
                                         <strong>Class:</strong> {Array.from({ length: Number(selectedHotel.starRating) || 5 }, (_, i) => '★').join('')} Star Class
                                     </div>
                                     <div style={{ fontSize: '14px' }}>
-                                        <strong>Price:</strong> Rs. {Number(selectedHotel.price).toLocaleString()} / night
+                                        <strong>Price:</strong> {convertPrice(selectedHotel.price)} / night
                                     </div>
                                     {selectedHotel.website && (
                                         <div style={{ fontSize: '14px' }}>

@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ReviewSection from './ReviewSection';
+import { useCurrency } from './context/CurrencyContext';
 
 function BookingPage() {
+    const { convertPrice } = useCurrency();
     const { id } = useParams();
     const navigate = useNavigate();
     const [hotel, setHotel] = useState(null);
@@ -96,7 +98,7 @@ function BookingPage() {
                             </a>
                         )}
                         <p style={{ margin: '4px 0 0 0', fontSize: '14px', fontWeight: '700', color: 'var(--primary)' }}>
-                            Rs. {Number(hotel.price).toLocaleString()} <span style={{ fontWeight: 'normal', color: 'var(--text-light)', fontSize: '13px' }}>/ night</span>
+                            {convertPrice(hotel.price)} <span style={{ fontWeight: 'normal', color: 'var(--text-light)', fontSize: '13px' }}>/ night</span>
                         </p>
                     </div>
                 )}

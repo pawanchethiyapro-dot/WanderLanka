@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import { useCurrency } from './context/CurrencyContext';
+
 function MyBookings() {
+    const { convertPrice } = useCurrency();
     const [hotelBookings, setHotelBookings] = useState([]);
     const [riderBookings, setRiderBookings] = useState([]);
     const [activeTab, setActiveTab] = useState('hotels');
@@ -94,7 +97,7 @@ function MyBookings() {
                                     {b.hotelId && (
                                         <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '12px' }}>
                                             <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>📍 Location:</strong> {b.hotelId.location}</p>
-                                            <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>💰 Price:</strong> Rs. {Number(b.hotelId.price).toLocaleString()} / Night</p>
+                                            <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>💰 Price:</strong> {convertPrice(b.hotelId.price)} / Night</p>
                                         </div>
                                     )}
                                     <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>👤 Guest Name:</strong> {b.customerName}</p>
@@ -136,7 +139,7 @@ function MyBookings() {
                                             <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>Vehicle Type:</strong> {b.riderId.vehicleType}</p>
                                             <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>Plate Number:</strong> {b.riderId.plateNumber}</p>
                                             <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>Contact Phone:</strong> {b.riderId.phone}</p>
-                                            <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>💰 Price:</strong> Rs. {Number(b.riderId.pricePerDay).toLocaleString()} / Day</p>
+                                            <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>💰 Price:</strong> {convertPrice(b.riderId.pricePerDay)} / Day</p>
                                         </div>
                                     )}
                                     <p style={{ margin: '4px 0', fontSize: '14px' }}><strong>👤 Passenger Name:</strong> {b.customerName}</p>

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Plus, Trash2, ArrowUp, ArrowDown, Calculator, Calendar, Car, Hotel, Compass, Star, ChevronRight } from 'lucide-react';
+import { useCurrency } from './context/CurrencyContext';
 import L from 'leaflet';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
@@ -46,6 +47,7 @@ const SRI_LANKA_CITIES = [
 
 function ItineraryPlanner() {
     const navigate = useNavigate();
+    const { convertPrice } = useCurrency();
     const [hotels, setHotels] = useState([]);
     const [riders, setRiders] = useState([]);
     const [selectedStops, setSelectedStops] = useState([
@@ -290,15 +292,15 @@ function ItineraryPlanner() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                                 <span style={{ color: 'var(--text-light)' }}>Hotel Rooms (Starting total):</span>
-                                <strong style={{ color: 'var(--text-h)' }}>Rs. {estimates.hotels.toLocaleString()}</strong>
+                                <strong style={{ color: 'var(--text-h)' }}>{convertPrice(estimates.hotels)}</strong>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                                 <span style={{ color: 'var(--text-light)' }}>Travel Rider (Starting daily):</span>
-                                <strong style={{ color: 'var(--text-h)' }}>Rs. {estimates.rider.toLocaleString()}</strong>
+                                <strong style={{ color: 'var(--text-h)' }}>{convertPrice(estimates.rider)}</strong>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', borderTop: '1px solid var(--border)', paddingTop: '10px', marginTop: '5px' }}>
                                 <strong style={{ color: 'var(--primary)' }}>Estimated Tour Cost:</strong>
-                                <strong style={{ color: 'var(--primary)', fontSize: '18px' }}>Rs. {estimates.total.toLocaleString()}</strong>
+                                <strong style={{ color: 'var(--primary)', fontSize: '18px' }}>{convertPrice(estimates.total)}</strong>
                             </div>
                         </div>
                     </div>
@@ -375,8 +377,11 @@ function ItineraryPlanner() {
                                             <img src={getHotelImage(hotel)} alt={hotel.name} style={{ width: '60px', height: '50px', borderRadius: '8px', objectFit: 'cover' }} />
                                             <div style={{ flexGrow: 1, minWidth: 0 }}>
                                                 <h4 style={{ margin: '0 0 2px 0', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-h)' }}>{hotel.name}</h4>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '11px', color: 'var(--accent-amber)' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '11px', color: 'var(--accent-amber)', marginBottom: '2px' }}>
                                                     <Star size={10} fill="var(--accent-amber)" /> {hotel.averageRating > 0 ? hotel.averageRating : 'New'}
+                                                </div>
+                                                <div style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: '600' }}>
+                                                    {convertPrice(hotel.price)}/night
                                                 </div>
                                             </div>
                                             <button 
@@ -409,7 +414,10 @@ function ItineraryPlanner() {
                                             <img src={getVehicleImage(rider)} alt={rider.driverName} style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} />
                                             <div style={{ flexGrow: 1, minWidth: 0 }}>
                                                 <h4 style={{ margin: '0 0 2px 0', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-h)' }}>{rider.driverName}</h4>
-                                                <span style={{ fontSize: '11px', color: 'var(--text-light)' }}>{rider.vehicleType}</span>
+                                                <span style={{ fontSize: '11px', color: 'var(--text-light)', display: 'block', marginBottom: '2px' }}>{rider.vehicleType}</span>
+                                                <div style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: '600' }}>
+                                                    {convertPrice(rider.pricePerDay)}/day
+                                                </div>
                                             </div>
                                             <button 
                                                 onClick={() => navigate(`/book-rider/${rider._id}`)}

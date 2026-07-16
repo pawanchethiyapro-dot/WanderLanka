@@ -15,6 +15,7 @@ import Settings from './Settings';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LogOut, Settings as SettingsIcon } from 'lucide-react';
 import ItineraryPlanner from './ItineraryPlanner';
+import { CurrencyProvider, useCurrency } from './context/CurrencyContext';
 
 const PrivateRoute = ({ children, role }) => {
     const { user, loading } = useAuth();
@@ -26,6 +27,7 @@ const PrivateRoute = ({ children, role }) => {
 
 const Navigation = () => {
     const { user, logout } = useAuth();
+    const { currency, setCurrency } = useCurrency();
 
     return (
       <nav style={{ 
@@ -82,6 +84,32 @@ const Navigation = () => {
             }} onMouseOver={(e) => { e.target.style.background = 'var(--primary-hover)'; e.target.style.transform = 'translateY(-1px)'; }} onMouseOut={(e) => { e.target.style.background = 'var(--primary)'; e.target.style.transform = 'none'; }}>My Bookings</Link>
           )}
 
+          {/* Currency Dropdown Selector */}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                color: 'white',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '20px',
+                padding: '6px 12px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                outline: 'none',
+                appearance: 'none',
+                WebkitAppearance: 'none'
+              }}
+            >
+              <option value="LKR" style={{ background: 'var(--navy-blue)', color: 'white' }}>🇱🇰 LKR (Rs)</option>
+              <option value="USD" style={{ background: 'var(--navy-blue)', color: 'white' }}>🇺🇸 USD ($)</option>
+              <option value="EUR" style={{ background: 'var(--navy-blue)', color: 'white' }}>🇪🇺 EUR (€)</option>
+              <option value="GBP" style={{ background: 'var(--navy-blue)', color: 'white' }}>🇬🇧 GBP (£)</option>
+            </select>
+          </div>
+
           {!user ? (
             <Link to="/login" style={navLinkStyle}>Login</Link>
           ) : (
@@ -104,6 +132,7 @@ const navLinkStyle = { color: '#cbd5e1', textDecoration: 'none', fontWeight: '60
 function App() {
   return (
     <AuthProvider>
+      <CurrencyProvider>
         <Router>
           <Navigation />
           <Routes>
@@ -134,6 +163,7 @@ function App() {
             } />
           </Routes>
         </Router>
+      </CurrencyProvider>
     </AuthProvider>
   );
 }

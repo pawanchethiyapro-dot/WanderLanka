@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { X, Star } from 'lucide-react';
+import { useCurrency } from './context/CurrencyContext';
 
 function RiderList() {
+    const { convertPrice } = useCurrency();
     const [riders, setRiders] = useState([]);
     const navigate = useNavigate();
     const [selectedRider, setSelectedRider] = useState(null);
@@ -202,7 +204,7 @@ function RiderList() {
                                 <strong>📞 Contact:</strong> {r.phone}
                             </p>
                             <p style={{ margin: '0 0 20px 0', color: 'var(--primary)', fontWeight: '700', fontSize: '18px' }}>
-                                Rs. {r.pricePerDay ? Number(r.pricePerDay).toLocaleString() : 'N/A'} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ day</span>
+                                {r.pricePerDay ? convertPrice(r.pricePerDay) : 'N/A'} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ day</span>
                             </p>
                             <button 
                                 onClick={(e) => {
@@ -340,7 +342,7 @@ function RiderList() {
                                         <strong>Plate No:</strong> {selectedRider.plateNumber}
                                     </div>
                                     <div style={{ fontSize: '14px' }}>
-                                        <strong>Price:</strong> Rs. {Number(selectedRider.pricePerDay).toLocaleString()} / day
+                                        <strong>Price:</strong> {convertPrice(selectedRider.pricePerDay)} / day
                                     </div>
                                 </div>
 
