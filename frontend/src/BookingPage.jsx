@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ReviewSection from './ReviewSection';
 import { useCurrency } from './context/CurrencyContext';
+import { Hotel } from 'lucide-react';
+import PaymentModal from './PaymentModal';
 
 function BookingPage() {
     const { convertPrice } = useCurrency();
@@ -14,6 +16,7 @@ function BookingPage() {
         checkInDate: '', 
         customerName: '' 
     });
+    const [showPayment, setShowPayment] = useState(false);
 
     useEffect(() => {
         // Retrieve the specific hotel details to display in the header
@@ -25,15 +28,20 @@ function BookingPage() {
             .catch(err => console.error(err));
     }, [id]);
 
-    const handleBooking = async (e) => {
+    const handleBooking = (e) => {
         e.preventDefault();
+        setShowPayment(true);
+    };
+
+    const completeBookingProcess = async () => {
         try {
             await axios.post('http://localhost:5001/api/bookings', booking);
-            alert('Booking saved to database!');
+            setShowPayment(false);
+            alert('Booking payment successful and registered, machan!');
             navigate('/my-bookings'); 
         } catch (err) {
             console.error(err);
-            alert('Error saving booking.');
+            alert('Error registering booking details after payment.');
         }
     };
 
@@ -58,8 +66,8 @@ function BookingPage() {
                 borderRadius: '16px',
                 textAlign: 'left'
             }}>
-                <h1 style={{ fontSize: '28px', margin: '0 0 10px 0', color: 'var(--navy-blue)', textAlign: 'center' }}>
-                    🏨 Book Hotel
+                <h1 style={{ fontSize: '28px', margin: '0 0 10px 0', color: 'var(--navy-blue)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <Hotel size={28} style={{ color: 'var(--primary)' }} /> Book Hotel
                 </h1>
                 {hotel && (
                     <div style={{ 
@@ -148,6 +156,16 @@ function BookingPage() {
             <div style={{ width: '100%', maxWidth: '600px' }}>
                 <ReviewSection itemType="Hotel" itemId={id} />
             </div>
+
+            {showPayment && hotel && (
+                <PaymentModal 
+                    amount={hotel.price} 
+                    itemName={hotel.name} 
+                    description={`Stay Reservation at ${hotel.location}`} 
+                    onSuccess={completeBookingProcess} 
+                    onCancel={() => setShowPayment(false)} 
+                />
+            )}
         </div>
     );
 }

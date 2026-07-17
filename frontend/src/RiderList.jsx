@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { X, Star } from 'lucide-react';
+import { X, Star, Car } from 'lucide-react';
 import { useCurrency } from './context/CurrencyContext';
 
 function RiderList() {
@@ -82,7 +82,7 @@ function RiderList() {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 fontFamily: 'var(--heading)'
-            }}>🚗 Travel Riders</h1>
+            }}><span style={{ display: 'inline-flex', alignItems: 'center', gap: '12px' }}><Car size={32} style={{ color: 'var(--primary)' }} /> Travel Riders</span></h1>
             <p style={{ textAlign: 'center', color: 'var(--text-light)', marginBottom: '40px', fontSize: '16px' }}>
                 Hire local, verified drivers to explore Sri Lanka at your own pace.
             </p>
@@ -122,11 +122,11 @@ function RiderList() {
                             onChange={(e) => setTypeFilter(e.target.value)}
                             style={{ width: '100%', background: 'var(--card-bg)', appearance: 'none', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--text)' }}
                         >
-                            <option value="all">🚗 All Types</option>
-                            <option value="tuk">🛺 Tuk Tuk</option>
-                            <option value="car">🚗 Car (Sedan/hatchback)</option>
-                            <option value="van">🚐 Van</option>
-                            <option value="suv">🚙 SUV / Jeep</option>
+                            <option value="all">All Types</option>
+                            <option value="tuk">Tuk Tuk</option>
+                            <option value="car">Car (Sedan/hatchback)</option>
+                            <option value="van">Van</option>
+                            <option value="suv">SUV / Jeep</option>
                         </select>
                     </div>
 
@@ -151,9 +151,9 @@ function RiderList() {
                         onChange={(e) => setSortBy(e.target.value)}
                         style={{ width: '100%', background: 'var(--card-bg)', appearance: 'none', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--text)' }}
                     >
-                        <option value="default">✨ Default</option>
-                        <option value="price-asc">💵 Price: Low to High</option>
-                        <option value="price-desc">📈 Price: High to Low</option>
+                        <option value="default">Default</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
                     </select>
                 </div>
             </div>

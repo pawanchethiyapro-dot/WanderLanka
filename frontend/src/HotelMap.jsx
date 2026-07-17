@@ -17,7 +17,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function HotelMap({ hotels }) {
+function HotelMap({ hotels, height = '400px' }) {
     const navigate = useNavigate();
 
     // Bounds for Sri Lanka
@@ -33,7 +33,7 @@ function HotelMap({ hotels }) {
     const mappedHotels = hotels.filter(h => h.lat && h.lng);
 
     return (
-        <div style={{ height: '400px', width: '100%', borderRadius: '15px', overflow: 'hidden', boxShadow: 'var(--shadow)', marginBottom: '40px' }}>
+        <div style={{ height, width: '100%', borderRadius: '15px', overflow: 'hidden', boxShadow: 'var(--shadow)', marginBottom: '40px' }}>
             <MapContainer 
                 center={defaultCenter} 
                 zoom={7.5} 

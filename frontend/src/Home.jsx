@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sun, CloudRain, Wind, CloudFog, Cloud, RefreshCw, Compass } from 'lucide-react';
+import { Sun, CloudRain, Wind, CloudFog, Cloud, RefreshCw, Compass, Hotel, Car, ClipboardList, Lightbulb } from 'lucide-react';
 
 function Home() {
   const navigate = useNavigate();
@@ -371,7 +371,7 @@ function Home() {
                 </div>
               </div>
 
-              <div style={{ 
+              <div style={{
                 background: 'rgba(255, 255, 255, 0.02)', 
                 border: '1px solid rgba(255, 255, 255, 0.05)', 
                 borderRadius: '12px', 
@@ -379,9 +379,13 @@ function Home() {
                 fontSize: '13px',
                 color: 'var(--text)',
                 lineHeight: '1.4',
-                marginTop: 'auto'
+                marginTop: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
               }}>
-                💡 <strong>Trip Tip:</strong> {w.tip}
+                <Lightbulb size={16} style={{ color: 'var(--accent-amber)', flexShrink: 0 }} />
+                <span><strong>Trip Tip:</strong> {w.tip}</span>
               </div>
             </div>
           ))}
@@ -402,7 +406,9 @@ function Home() {
         }}>
           {/* Card 1 */}
           <div className="card" style={{ padding: '30px', textAlign: 'center', background: 'var(--bg)' }}>
-            <span style={{ fontSize: '48px', marginBottom: '15px' }}>🏨</span>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+              <Hotel size={48} style={{ color: 'var(--primary)' }} />
+            </div>
             <h3 style={{ margin: '10px 0' }}>Book Premium Stays</h3>
             <p style={{ color: 'var(--text)', fontSize: '15px' }}>
               Find and register handpicked hotels from beachfront resorts to misty mountain retreats.
@@ -427,7 +433,9 @@ function Home() {
 
           {/* Card 2 */}
           <div className="card" style={{ padding: '30px', textAlign: 'center', background: 'var(--bg)' }}>
-            <span style={{ fontSize: '48px', marginBottom: '15px' }}>🚗</span>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+              <Car size={48} style={{ color: 'var(--primary)' }} />
+            </div>
             <h3 style={{ margin: '10px 0' }}>Hire Travel Riders</h3>
             <p style={{ color: 'var(--text)', fontSize: '15px' }}>
               Connect with verified drivers and riders to guide you safely through cultural spots.
@@ -452,7 +460,9 @@ function Home() {
 
           {/* Card 3 */}
           <div className="card" style={{ padding: '30px', textAlign: 'center', background: 'var(--bg)' }}>
-            <span style={{ fontSize: '48px', marginBottom: '15px' }}>📋</span>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+              <ClipboardList size={48} style={{ color: 'var(--primary)' }} />
+            </div>
             <h3 style={{ margin: '10px 0' }}>Manage Reservations</h3>
             <p style={{ color: 'var(--text)', fontSize: '15px' }}>
               Easily view your active room bookings and hired driver logs in one single interface.

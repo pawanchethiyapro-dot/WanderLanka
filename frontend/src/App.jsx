@@ -13,7 +13,7 @@ import Partner from './Partner';
 import Login from './Login';
 import Settings from './Settings';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { LogOut, Settings as SettingsIcon } from 'lucide-react';
+import { LogOut, Settings as SettingsIcon, Palmtree } from 'lucide-react';
 import ItineraryPlanner from './ItineraryPlanner';
 import { CurrencyProvider, useCurrency } from './context/CurrencyContext';
 
@@ -56,7 +56,7 @@ const Navigation = () => {
             alignItems: 'center',
             gap: '6px'
           }}>
-            <span style={{ fontSize: '28px' }}>🌴</span> Wander<span style={{ color: 'var(--primary)' }}>Lanka</span>
+            <Palmtree size={28} style={{ color: 'var(--primary)', flexShrink: 0 }} /> Wander<span style={{ color: 'var(--primary)' }}>Lanka</span>
           </Link>
         </div>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>

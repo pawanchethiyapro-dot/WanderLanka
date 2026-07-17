@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ReviewSection from './ReviewSection';
 import { useCurrency } from './context/CurrencyContext';
+import { Car } from 'lucide-react';
+import PaymentModal from './PaymentModal';
 
 function RiderBookingPage() {
   const { convertPrice } = useCurrency();
@@ -10,6 +12,7 @@ function RiderBookingPage() {
   const navigate = useNavigate();
   const [rider, setRider] = useState(null);
   const [booking, setBooking] = useState({ riderId: id, customerName: '' });
+  const [showPayment, setShowPayment] = useState(false);
 
   useEffect(() => {
     // Retrieve the specific rider/vehicle details to display in the header
@@ -21,15 +24,20 @@ function RiderBookingPage() {
         .catch(err => console.error(err));
   }, [id]);
 
-  const handleBooking = async (e) => {
+  const handleBooking = (e) => {
     e.preventDefault();
+    setShowPayment(true);
+  };
+
+  const completeBookingProcess = async () => {
     try {
       await axios.post('http://localhost:5001/api/rider-bookings', booking);
-      alert('Rider Booked Successfully!');
+      setShowPayment(false);
+      alert('Rider booking payment successful and registered, machan!');
       navigate('/my-bookings');
     } catch (err) {
       console.error(err);
-      alert('Error booking rider.');
+      alert('Error registering rider booking after payment.');
     }
   };
 
@@ -54,8 +62,8 @@ function RiderBookingPage() {
             borderRadius: '16px',
             textAlign: 'left'
         }}>
-            <h1 style={{ fontSize: '28px', margin: '0 0 10px 0', color: 'var(--navy-blue)', textAlign: 'center' }}>
-                🚗 Book Rider
+            <h1 style={{ fontSize: '28px', margin: '0 0 10px 0', color: 'var(--navy-blue)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Car size={28} style={{ color: 'var(--primary)' }} /> Book Rider
             </h1>
             {rider && (
                 <div style={{ 
@@ -122,9 +130,20 @@ function RiderBookingPage() {
             </form>
         </div>
 
+
         <div style={{ width: '100%', maxWidth: '600px' }}>
             <ReviewSection itemType="Vehicle" itemId={id} />
         </div>
+
+        {showPayment && rider && (
+            <PaymentModal 
+                amount={rider.pricePerDay} 
+                itemName={rider.driverName} 
+                description={`Driver Hire Service (${rider.vehicleType})`} 
+                onSuccess={completeBookingProcess} 
+                onCancel={() => setShowPayment(false)} 
+            />
+        )}
     </div>
   );
 }

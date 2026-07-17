@@ -306,13 +306,12 @@ function ItineraryPlanner() {
                     </div>
                 </div>
 
-                {/* Center Panel - Route Map */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minHeight: '400px' }}>
-                    <div className="card" style={{ padding: '0', background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '20px', overflow: 'hidden', height: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div className="card" style={{ padding: '0', background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '20px', overflow: 'hidden', height: '500px' }}>
                         <div style={{ padding: '20px', background: 'rgba(255, 255, 255, 0.02)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <Compass size={22} style={{ color: 'var(--primary)' }} /> Interactive Itinerary Map
                         </div>
-                        <div style={{ height: 'calc(100% - 63px)', width: '100%', minHeight: '350px' }}>
+                        <div style={{ height: 'calc(500px - 63px)', width: '100%' }}>
                             <MapContainer 
                                 center={[7.8731, 80.7718]} 
                                 zoom={7.2} 

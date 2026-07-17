@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { useCurrency } from './context/CurrencyContext';
+import { Hotel, Car } from 'lucide-react';
 
 function MyBookings() {
     const { convertPrice } = useCurrency();
@@ -45,7 +46,7 @@ function MyBookings() {
                         transition: 'all 0.3s'
                     }}
                 >
-                    🏨 Hotel Bookings ({hotelBookings.length})
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><Hotel size={18} /> Hotel Bookings ({hotelBookings.length})</span>
                 </button>
                 <button 
                     onClick={() => setActiveTab('riders')}
@@ -62,7 +63,7 @@ function MyBookings() {
                         transition: 'all 0.3s'
                     }}
                 >
-                    🚗 Rider Bookings ({riderBookings.length})
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><Car size={18} /> Rider Bookings ({riderBookings.length})</span>
                 </button>
             </div>
 
@@ -72,7 +73,7 @@ function MyBookings() {
                     <h2 style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--text-h)', fontSize: '22px' }}>Hotel Reservations</h2>
                     {hotelBookings.length === 0 ? (
                         <div style={{ textAlign: 'center', color: 'var(--text-light)', padding: '50px 20px', background: 'var(--bg)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
-                            <span style={{ fontSize: '48px', display: 'block', marginBottom: '15px' }}>🏨</span>
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}><Hotel size={48} style={{ color: 'var(--primary)' }} /></div>
                             <p style={{ margin: '0' }}>No hotel bookings found. Go to "View Hotels" to make a reservation!</p>
                         </div>
                     ) : (
@@ -112,7 +113,7 @@ function MyBookings() {
                     <h2 style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--text-h)', fontSize: '22px' }}>Rider/Vehicle Bookings</h2>
                     {riderBookings.length === 0 ? (
                         <div style={{ textAlign: 'center', color: 'var(--text-light)', padding: '50px 20px', background: 'var(--bg)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
-                            <span style={{ fontSize: '48px', display: 'block', marginBottom: '15px' }}>🚗</span>
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}><Car size={48} style={{ color: 'var(--primary)' }} /></div>
                             <p style={{ margin: '0' }}>No rider bookings found. Go to "View Riders" to hire a driver!</p>
                         </div>
                     ) : (
@@ -121,7 +122,7 @@ function MyBookings() {
                                 <div key={b._id} className="card" style={{ padding: '24px', border: '1px solid var(--border)', textAlign: 'left', background: 'var(--social-bg)' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
                                         <h3 style={{ margin: '0', color: 'var(--text-h)', fontSize: '18px' }}>
-                                            🚗 {b.riderId ? b.riderId.driverName : 'Unknown Driver'}
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><Car size={18} style={{ color: 'var(--primary)' }} /> {b.riderId ? b.riderId.driverName : 'Unknown Driver'}</span>
                                         </h3>
                                         <span style={{ 
                                             padding: '4px 10px', 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HotelMap from './HotelMap';
-import { X, Star } from 'lucide-react';
+import { X, Star, Hotel } from 'lucide-react';
 import { useCurrency } from './context/CurrencyContext';
 
 function HotelList() {
@@ -75,7 +75,7 @@ function HotelList() {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 fontFamily: 'var(--heading)'
-            }}>🏨 Premium Stays</h1>
+            }}><span style={{ display: 'inline-flex', alignItems: 'center', gap: '12px' }}><Hotel size={32} style={{ color: 'var(--primary)' }} /> Premium Stays</span></h1>
             <p style={{ textAlign: 'center', color: 'var(--text-light)', marginBottom: '40px', fontSize: '16px' }}>
                 Handpicked hotels and resorts across Sri Lanka for your comfort.
             </p>
@@ -115,7 +115,7 @@ function HotelList() {
                             onChange={(e) => setStarFilter(e.target.value)}
                             style={{ width: '100%', background: 'var(--card-bg)', appearance: 'none', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--text)' }}
                         >
-                            <option value="all">⭐ All Stays</option>
+                            <option value="all">All Stays</option>
                             <option value="1">1 Star</option>
                             <option value="2">2 Stars</option>
                             <option value="3">3 Stars</option>
@@ -155,92 +155,110 @@ function HotelList() {
                         onChange={(e) => setSortBy(e.target.value)}
                         style={{ width: '100%', background: 'var(--card-bg)', appearance: 'none', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--text)' }}
                     >
-                        <option value="default">✨ Default</option>
-                        <option value="price-asc">💵 Price: Low to High</option>
-                        <option value="price-desc">📈 Price: High to Low</option>
+                        <option value="default">Default</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
                     </select>
                 </div>
             </div>
 
-            <HotelMap hotels={filteredHotels} />
+            {/* Split Layout Container */}
+            <div style={{ 
+                display: 'flex', 
+                gap: '30px', 
+                flexDirection: 'row-reverse', 
+                flexWrap: 'wrap', 
+                alignItems: 'flex-start',
+                width: '100%',
+                boxSizing: 'border-box'
+            }}>
 
-            {/* Results count indicator */}
-            <div style={{ color: 'var(--text-light)', fontSize: '14px', marginBottom: '20px', marginTop: '10px' }}>
-                Showing {filteredHotels.length} stay{filteredHotels.length !== 1 ? 's' : ''} in Sri Lanka
-            </div>
+                {/* Right Column: Sticky Map */}
+                <div style={{ flex: '1 1 38%', minWidth: '320px', position: 'sticky', top: '100px', height: '550px', zIndex: 10 }}>
+                    <HotelMap hotels={filteredHotels} height="100%" />
+                </div>
+                
+                {/* Left Column: Listings */}
+                <div style={{ flex: '1 1 55%', minWidth: '320px' }}>
+                    <div style={{ color: 'var(--text-light)', fontSize: '14px', marginBottom: '20px' }}>
+                        Showing {filteredHotels.length} stay{filteredHotels.length !== 1 ? 's' : ''} in Sri Lanka
+                    </div>
 
-            <div className="card-container"> 
-                {filteredHotels.map((hotel) => (
-                    <div 
-                        key={hotel._id} 
-                        className="card" 
-                        onClick={() => setSelectedHotel(hotel)}
-                        style={{ cursor: 'pointer' }}
-                    > 
-                        <img 
-                            src={getHotelImage(hotel)} 
-                            alt={hotel.name} 
-                            style={{ width: '100%', height: '220px', objectFit: 'cover' }}
-                            onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80";
-                            }}
-                        />
-                        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '4px', marginBottom: '5px' }}>
-                                <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-h)' }}>{hotel.name}</h3>
-                                <div style={{ fontSize: '12px', color: 'var(--accent-amber)', letterSpacing: '1px', fontWeight: '700' }}>
-                                    {Array.from({ length: Number(hotel.starRating) || 5 }, (_, i) => '★').join('')} Class
+                    <div className="card-container" style={{ padding: '0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}> 
+                        {filteredHotels.map((hotel) => (
+                            <div 
+                                key={hotel._id} 
+                                className="card" 
+                                onClick={() => setSelectedHotel(hotel)}
+                                style={{ cursor: 'pointer' }}
+                            > 
+                                <img 
+                                    src={getHotelImage(hotel)} 
+                                    alt={hotel.name} 
+                                    style={{ width: '100%', height: '220px', objectFit: 'cover' }}
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80";
+                                    }}
+                                />
+                                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '4px', marginBottom: '5px' }}>
+                                        <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-h)' }}>{hotel.name}</h3>
+                                        <div style={{ fontSize: '12px', color: 'var(--accent-amber)', letterSpacing: '1px', fontWeight: '700' }}>
+                                            {Array.from({ length: Number(hotel.starRating) || 5 }, (_, i) => '★').join('')} Class
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontSize: '14px' }}>
+                                        <span style={{ color: 'var(--accent-amber)', display: 'flex', alignItems: 'center' }}>⭐</span>
+                                        <strong style={{ color: 'var(--text-h)' }}>
+                                            {hotel.averageRating > 0 ? hotel.averageRating : 'New'}
+                                        </strong>
+                                        {hotel.reviewCount > 0 && (
+                                            <span style={{ color: 'var(--text-light)' }}>({hotel.reviewCount} reviews)</span>
+                                        )}
+                                    </div>
+                                    <p style={{ margin: '0 0 8px 0', color: 'var(--text-light)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <span>📍</span> {hotel.location}
+                                    </p>
+                                    {hotel.website && (
+                                        <a 
+                                            href={hotel.website} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()}
+                                            style={{ 
+                                                color: 'var(--primary)', 
+                                                textDecoration: 'none', 
+                                                fontSize: '13px', 
+                                                display: 'inline-flex', 
+                                                alignItems: 'center', 
+                                                gap: '4px',
+                                                marginBottom: '12px',
+                                                fontWeight: '600'
+                                            }}
+                                        >
+                                            🌐 Visit Website
+                                        </a>
+                                    )}
+                                    <p style={{ margin: '0 0 20px 0', color: 'var(--primary)', fontWeight: '700', fontSize: '18px' }}>
+                                        {hotel.price ? convertPrice(hotel.price) : 'N/A'} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ night</span>
+                                    </p>
+                                    <button 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/book/${hotel._id}`);
+                                        }}
+                                        className="btn-primary"
+                                        style={{ marginTop: 'auto', width: '100%' }}
+                                    >
+                                        Book Now
+                                    </button>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontSize: '14px' }}>
-                                <span style={{ color: 'var(--accent-amber)', display: 'flex', alignItems: 'center' }}>⭐</span>
-                                <strong style={{ color: 'var(--text-h)' }}>
-                                    {hotel.averageRating > 0 ? hotel.averageRating : 'New'}
-                                </strong>
-                                {hotel.reviewCount > 0 && (
-                                    <span style={{ color: 'var(--text-light)' }}>({hotel.reviewCount} reviews)</span>
-                                )}
-                            </div>
-                            <p style={{ margin: '0 0 8px 0', color: 'var(--text-light)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span>📍</span> {hotel.location}
-                            </p>
-                            {hotel.website && (
-                                <a 
-                                    href={hotel.website} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    onClick={(e) => e.stopPropagation()}
-                                    style={{ 
-                                        color: 'var(--primary)', 
-                                        textDecoration: 'none', 
-                                        fontSize: '13px', 
-                                        display: 'inline-flex', 
-                                        alignItems: 'center', 
-                                        gap: '4px',
-                                        marginBottom: '12px',
-                                        fontWeight: '600'
-                                    }}
-                                >
-                                    🌐 Visit Website
-                                </a>
-                            )}
-                            <p style={{ margin: '0 0 20px 0', color: 'var(--primary)', fontWeight: '700', fontSize: '18px' }}>
-                                {hotel.price ? convertPrice(hotel.price) : 'N/A'} <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-light)' }}>/ night</span>
-                            </p>
-                            <button 
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(`/book/${hotel._id}`);
-                                }}
-                                className="btn-primary"
-                                style={{ marginTop: 'auto', width: '100%' }}
-                            >
-                                Book Now
-                            </button>
-                        </div>
+                        ))}
                     </div>
-                ))}
+                </div>
+
             </div>
 
             {/* Hotel Profile Modal Overlay */}

@@ -199,3 +199,39 @@ button:hover, .btn-primary:hover {
 .leaflet-container {
   background: var(--bg) !important;
 }
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-h);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--primary);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.form-input {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding-left: 42px !important;
+}
