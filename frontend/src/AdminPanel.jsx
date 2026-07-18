@@ -16,6 +16,49 @@ function AdminPanel() {
     const [bookingType, setBookingType] = useState('hotel'); // 'hotel' or 'rider'
     const [currentBooking, setCurrentBooking] = useState({});
 
+    // Bulk Actions State
+    const [selectedIds, setSelectedIds] = useState([]);
+
+    const getActiveList = () => {
+        if (activeTab === 'hotels') return hotels;
+        if (activeTab === 'riders') return riders;
+        if (activeTab === 'hotelBookings') return hotelBookings;
+        return riderBookings;
+    };
+
+    const handleTabChange = (tabId) => {
+        setActiveTab(tabId);
+        setSelectedIds([]);
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        if (window.confirm(`Are you sure you want to delete the ${selectedIds.length} selected records?`)) {
+            try {
+                const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                const token = userInfo?.token;
+                const config = { headers: { Authorization: `Bearer ${token}` } };
+                
+                const endpoint = activeTab === 'hotels' ? 'hotels' :
+                                 activeTab === 'riders' ? 'vehicles' :
+                                 activeTab === 'hotelBookings' ? 'bookings' : 'rider-bookings';
+
+                setLoading(true);
+                await Promise.all(selectedIds.map(id => 
+                    axios.delete(`http://localhost:5001/api/${endpoint}/${id}`, config)
+                ));
+                
+                alert(`Successfully deleted ${selectedIds.length} records, machan!`);
+                setSelectedIds([]);
+                fetchData();
+            } catch (error) {
+                alert('Error performing bulk deletion');
+                console.error(error);
+                fetchData();
+            }
+        }
+    };
+
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -111,7 +154,7 @@ function AdminPanel() {
 
     const TabButton = ({ id, label, icon: Icon }) => (
         <button
-            onClick={() => setActiveTab(id)}
+            onClick={() => handleTabChange(id)}
             style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -136,7 +179,14 @@ function AdminPanel() {
         <div className="page-container" style={{ padding: '2rem' }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                 <div style={{ marginBottom: '2rem' }}>
-                    <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', background: 'linear-gradient(to right, #fff, #a1a1aa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Admin Dashboard</h1>
+                    <h1 style={{ 
+                        fontSize: '2.5rem', 
+                        marginBottom: '0.5rem', 
+                        background: 'linear-gradient(to right, var(--primary), #3b82f6)', 
+                        WebkitBackgroundClip: 'text', 
+                        WebkitTextFillColor: 'transparent',
+                        fontFamily: 'var(--heading)'
+                    }}>Admin Dashboard</h1>
                     <p style={{ color: '#a1a1aa' }}>Manage all platform records centrally.</p>
                 </div>
 
@@ -147,16 +197,41 @@ function AdminPanel() {
                         <TabButton id="hotelBookings" label="Hotel Bookings" icon={CalendarDays} />
                         <TabButton id="riderBookings" label="Rider Bookings" icon={ContactRound} />
                     </div>
-                    {activeTab === 'hotelBookings' && (
-                        <button className="btn-primary" onClick={() => openModal('hotel', 'add')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Plus size={18} /> Add Hotel Booking
-                        </button>
-                    )}
-                    {activeTab === 'riderBookings' && (
-                        <button className="btn-primary" onClick={() => openModal('rider', 'add')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Plus size={18} /> Add Rider Booking
-                        </button>
-                    )}
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        {selectedIds.length > 0 && (
+                            <button 
+                                onClick={handleBulkDelete}
+                                style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: '8px', 
+                                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                                    color: 'white',
+                                    padding: '12px 20px',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 15px rgba(239, 68, 68, 0.3)',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+                                onMouseOut={(e) => e.target.style.transform = 'none'}
+                            >
+                                <Trash2 size={18} /> Delete Selected ({selectedIds.length})
+                            </button>
+                        )}
+                        {activeTab === 'hotelBookings' && (
+                            <button className="btn-primary" onClick={() => openModal('hotel', 'add')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Plus size={18} /> Add Hotel Booking
+                            </button>
+                        )}
+                        {activeTab === 'riderBookings' && (
+                            <button className="btn-primary" onClick={() => openModal('rider', 'add')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Plus size={18} /> Add Rider Booking
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="form-card" style={{ padding: '0', overflow: 'hidden' }}>
@@ -167,6 +242,20 @@ function AdminPanel() {
                             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                                 <thead>
                                     <tr style={{ background: 'rgba(255, 255, 255, 0.05)', color: '#cbd5e1' }}>
+                                        <th style={{ ...thStyle, width: '40px', padding: '16px 12px 16px 24px', textAlign: 'center' }}>
+                                            <input 
+                                                type="checkbox"
+                                                checked={getActiveList().length > 0 && selectedIds.length === getActiveList().length}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedIds(getActiveList().map(item => item._id));
+                                                    } else {
+                                                        setSelectedIds([]);
+                                                    }
+                                                }}
+                                                style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                                            />
+                                        </th>
                                         {activeTab === 'hotels' && (
                                             <>
                                                 <th style={thStyle}>Hotel Name</th>
@@ -205,51 +294,119 @@ function AdminPanel() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {activeTab === 'hotels' && hotels.map(hotel => (
-                                        <tr key={hotel._id} style={trStyle}>
-                                            <td style={tdStyle}>{hotel.name}</td>
-                                            <td style={tdStyle}>{hotel.location}</td>
-                                            <td style={tdStyle}>{hotel.price}</td>
-                                            <td style={{ ...tdStyle, textAlign: 'center' }}>
-                                                <button className="action-btn delete-btn" onClick={() => handleDelete('hotels', hotel._id)}><Trash2 size={16} /></button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {activeTab === 'riders' && riders.map(rider => (
-                                        <tr key={rider._id} style={trStyle}>
-                                            <td style={tdStyle}>{rider.driverName}</td>
-                                            <td style={tdStyle}>{rider.vehicleType}</td>
-                                            <td style={tdStyle}>{rider.plateNumber}</td>
-                                            <td style={tdStyle}>{rider.phone}</td>
-                                            <td style={{ ...tdStyle, textAlign: 'center' }}>
-                                                <button className="action-btn delete-btn" onClick={() => handleDelete('vehicles', rider._id)}><Trash2 size={16} /></button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {activeTab === 'hotelBookings' && hotelBookings.map(booking => (
-                                        <tr key={booking._id} style={trStyle}>
-                                            <td style={tdStyle}>{booking.customerName} <br/><span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{booking.contactNumber}</span></td>
-                                            <td style={tdStyle}>{booking.hotelId?.name || 'Unknown Hotel'}</td>
-                                            <td style={tdStyle}>{new Date(booking.date).toLocaleDateString()}</td>
-                                            <td style={tdStyle}>{booking.numberOfRooms}</td>
-                                            <td style={{ ...tdStyle, textAlign: 'center' }}>
-                                                <button className="action-btn edit-btn" style={{ marginRight: '8px' }} onClick={() => openModal('hotel', 'edit', booking)}><Edit size={16} /></button>
-                                                <button className="action-btn delete-btn" onClick={() => handleDelete('bookings', booking._id)}><Trash2 size={16} /></button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {activeTab === 'riderBookings' && riderBookings.map(booking => (
-                                        <tr key={booking._id} style={trStyle}>
-                                            <td style={tdStyle}>{booking.customerName} <br/><span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{booking.contactNumber}</span></td>
-                                            <td style={tdStyle}>{booking.riderId?.driverName || 'Unknown Rider'}</td>
-                                            <td style={tdStyle}>{new Date(booking.bookingDate).toLocaleDateString()}</td>
-                                            <td style={tdStyle}>{booking.numberOfDays} days</td>
-                                            <td style={{ ...tdStyle, textAlign: 'center' }}>
-                                                <button className="action-btn edit-btn" style={{ marginRight: '8px' }} onClick={() => openModal('rider', 'edit', booking)}><Edit size={16} /></button>
-                                                <button className="action-btn delete-btn" onClick={() => handleDelete('rider-bookings', booking._id)}><Trash2 size={16} /></button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {activeTab === 'hotels' && hotels.map(hotel => {
+                                        const isSelected = selectedIds.includes(hotel._id);
+                                        return (
+                                            <tr key={hotel._id} style={{ ...trStyle, background: isSelected ? 'rgba(14, 165, 233, 0.08)' : 'transparent' }}>
+                                                <td style={{ ...tdStyle, width: '40px', padding: '16px 12px 16px 24px', textAlign: 'center' }}>
+                                                    <input 
+                                                        type="checkbox"
+                                                        checked={isSelected}
+                                                        onChange={() => {
+                                                            if (isSelected) {
+                                                                setSelectedIds(selectedIds.filter(id => id !== hotel._id));
+                                                            } else {
+                                                                setSelectedIds([...selectedIds, hotel._id]);
+                                                            }
+                                                        }}
+                                                        style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                                                    />
+                                                </td>
+                                                <td style={tdStyle}>{hotel.name}</td>
+                                                <td style={tdStyle}>{hotel.location}</td>
+                                                <td style={tdStyle}>{hotel.price}</td>
+                                                <td style={{ ...tdStyle, textAlign: 'center' }}>
+                                                    <button className="action-btn delete-btn" onClick={() => handleDelete('hotels', hotel._id)}><Trash2 size={16} /></button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    {activeTab === 'riders' && riders.map(rider => {
+                                        const isSelected = selectedIds.includes(rider._id);
+                                        return (
+                                            <tr key={rider._id} style={{ ...trStyle, background: isSelected ? 'rgba(14, 165, 233, 0.08)' : 'transparent' }}>
+                                                <td style={{ ...tdStyle, width: '40px', padding: '16px 12px 16px 24px', textAlign: 'center' }}>
+                                                    <input 
+                                                        type="checkbox"
+                                                        checked={isSelected}
+                                                        onChange={() => {
+                                                            if (isSelected) {
+                                                                setSelectedIds(selectedIds.filter(id => id !== rider._id));
+                                                            } else {
+                                                                setSelectedIds([...selectedIds, rider._id]);
+                                                            }
+                                                        }}
+                                                        style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                                                    />
+                                                </td>
+                                                <td style={tdStyle}>{rider.driverName}</td>
+                                                <td style={tdStyle}>{rider.vehicleType}</td>
+                                                <td style={tdStyle}>{rider.plateNumber}</td>
+                                                <td style={tdStyle}>{rider.phone}</td>
+                                                <td style={{ ...tdStyle, textAlign: 'center' }}>
+                                                    <button className="action-btn delete-btn" onClick={() => handleDelete('vehicles', rider._id)}><Trash2 size={16} /></button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    {activeTab === 'hotelBookings' && hotelBookings.map(booking => {
+                                        const isSelected = selectedIds.includes(booking._id);
+                                        return (
+                                            <tr key={booking._id} style={{ ...trStyle, background: isSelected ? 'rgba(14, 165, 233, 0.08)' : 'transparent' }}>
+                                                <td style={{ ...tdStyle, width: '40px', padding: '16px 12px 16px 24px', textAlign: 'center' }}>
+                                                    <input 
+                                                        type="checkbox"
+                                                        checked={isSelected}
+                                                        onChange={() => {
+                                                            if (isSelected) {
+                                                                setSelectedIds(selectedIds.filter(id => id !== booking._id));
+                                                            } else {
+                                                                setSelectedIds([...selectedIds, booking._id]);
+                                                            }
+                                                        }}
+                                                        style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                                                    />
+                                                </td>
+                                                <td style={tdStyle}>{booking.customerName} <br/><span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{booking.contactNumber}</span></td>
+                                                <td style={tdStyle}>{booking.hotelId?.name || 'Unknown Hotel'}</td>
+                                                <td style={tdStyle}>{new Date(booking.date).toLocaleDateString()}</td>
+                                                <td style={tdStyle}>{booking.numberOfRooms}</td>
+                                                <td style={{ ...tdStyle, textAlign: 'center' }}>
+                                                    <button className="action-btn edit-btn" style={{ marginRight: '8px' }} onClick={() => openModal('hotel', 'edit', booking)}><Edit size={16} /></button>
+                                                    <button className="action-btn delete-btn" onClick={() => handleDelete('bookings', booking._id)}><Trash2 size={16} /></button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    {activeTab === 'riderBookings' && riderBookings.map(booking => {
+                                        const isSelected = selectedIds.includes(booking._id);
+                                        return (
+                                            <tr key={booking._id} style={{ ...trStyle, background: isSelected ? 'rgba(14, 165, 233, 0.08)' : 'transparent' }}>
+                                                <td style={{ ...tdStyle, width: '40px', padding: '16px 12px 16px 24px', textAlign: 'center' }}>
+                                                    <input 
+                                                        type="checkbox"
+                                                        checked={isSelected}
+                                                        onChange={() => {
+                                                            if (isSelected) {
+                                                                setSelectedIds(selectedIds.filter(id => id !== booking._id));
+                                                            } else {
+                                                                setSelectedIds([...selectedIds, booking._id]);
+                                                            }
+                                                        }}
+                                                        style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                                                    />
+                                                </td>
+                                                <td style={tdStyle}>{booking.customerName} <br/><span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{booking.contactNumber}</span></td>
+                                                <td style={tdStyle}>{booking.riderId?.driverName || 'Unknown Rider'}</td>
+                                                <td style={tdStyle}>{new Date(booking.bookingDate).toLocaleDateString()}</td>
+                                                <td style={tdStyle}>{booking.numberOfDays} days</td>
+                                                <td style={{ ...tdStyle, textAlign: 'center' }}>
+                                                    <button className="action-btn edit-btn" style={{ marginRight: '8px' }} onClick={() => openModal('rider', 'edit', booking)}><Edit size={16} /></button>
+                                                    <button className="action-btn delete-btn" onClick={() => handleDelete('rider-bookings', booking._id)}><Trash2 size={16} /></button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                             {((activeTab === 'hotels' && hotels.length === 0) ||
@@ -341,31 +498,38 @@ function AdminPanel() {
 
             <style>{`
                 .action-btn {
-                    background: rgba(255,255,255,0.05);
-                    border: 1px solid rgba(255,255,255,0.1);
-                    color: white;
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 6px;
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    transition: all 0.2s;
+                    width: 32px !important;
+                    height: 32px !important;
+                    padding: 0 !important;
+                    border-radius: 8px !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    cursor: pointer !important;
+                    transition: all 0.2s !important;
+                    border: 1px solid transparent !important;
+                    background-image: none !important;
+                    box-shadow: none !important;
                 }
-                .action-btn:hover {
-                    background: rgba(255,255,255,0.1);
-                    transform: translateY(-2px);
+                .edit-btn {
+                    color: #3b82f6 !important;
+                    border-color: rgba(59, 130, 246, 0.3) !important;
+                    background: rgba(59, 130, 246, 0.1) !important;
                 }
                 .edit-btn:hover {
-                    color: #3b82f6;
-                    border-color: rgba(59, 130, 246, 0.3);
-                    background: rgba(59, 130, 246, 0.1);
+                    background: rgba(59, 130, 246, 0.25);
+                    border-color: rgba(59, 130, 246, 0.5);
+                    transform: translateY(-2px);
+                }
+                .delete-btn {
+                    color: #ef4444 !important;
+                    border-color: rgba(239, 68, 68, 0.3) !important;
+                    background: rgba(239, 68, 68, 0.1) !important;
                 }
                 .delete-btn:hover {
-                    color: #ef4444;
-                    border-color: rgba(239, 68, 68, 0.3);
-                    background: rgba(239, 68, 68, 0.1);
+                    background: rgba(239, 68, 68, 0.25);
+                    border-color: rgba(239, 68, 68, 0.5);
+                    transform: translateY(-2px);
                 }
             `}</style>
         </div>
